@@ -18,7 +18,7 @@ Laro.register('Emberwind', function (La) {
 
     }).methods({
         enter : function (msg, fromState) {
-            La.ResourceLoader.getInstance().preloadImages(["opera_logo.png"], La.curry(this.operaProgressCallback, this));
+            La.ResourceLoader.getInstance().preloadImages(["laro.png"], La.curry(this.operaProgressCallback, this));
          
             var images = [
                 "titlescreen0.png", 
@@ -104,7 +104,7 @@ Laro.register('Emberwind', function (La) {
             this.timeInState += dt;
         },
         transition: function () {
-            return this.host.tryChangeState(this.timeInState > 5, La.FSM.kNextState, 'stage0');
+          //  return this.host.tryChangeState(this.timeInState > 5, La.FSM.kNextState, 'stage0');
         },
         draw: function (render) {
             render.clear(render.white);
