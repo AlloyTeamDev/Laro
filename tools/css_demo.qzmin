@@ -1,0 +1,17 @@
+{
+	projects: [
+		{
+			name: "Compile Test",
+			target: "./combined/all.css",
+			include: [
+				"../css/test1.css",
+				"../css/test2.css",
+				"../css/test3.css"
+			]
+		}
+	],
+	level: 0,
+	shrink: false,
+	encode: "utf-8",
+	comment: "Tecnent Web Tech Team"
+}

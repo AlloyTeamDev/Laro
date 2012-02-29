@@ -4,21 +4,33 @@ Laro.register('Emberwind', function (La) {
 
 	PKG.states = {
 		kStateIntro: 0,
-		kStateTimetrap: 1
+		kStateTimetrap: 1,
+        kStateMenu: 2,
+		
+		kStateLoadingStage: 3,
+		kStateInGame: 4
 	};
     
     var Game = La.Class(function (id) {
         this.canvasId = id;
         this.canvas = document.getElementById(id);
-        this.resources = new Emberwind.Resource()
-        this.resources.setCallback(La.curry(this.resourceCallback, this));
-        Emberwind.Resource.instance = this.resources;
         
         var statesList = [
             PKG.states.kStateIntro, PKG.IntroState,
-            PKG.states.kStateTimetrap, PKG.Timetrap
+            PKG.states.kStateTimetrap, PKG.Timetrap,
+            PKG.states.kStateMenu, PKG.Menu,
+			
+			PKG.states.kStateLoadingStage, PKG.LoadingStage,
+			PKG.states.kStateInGame, PKG.InGame
         ];
-        this.fsm = new La.AppFSM(this, statesList);    
+        this.fsm = new La.AppFSM(this, statesList);   
+        //this.sound = new La.Sound('resources/music/sfx.ogg', function () {console.log('sfx ok')});
+        //this.bgMusic = new La.Sound('resources/music/music.ogg', function() {console.log('music ok')});
+        
+        this.resources = new Emberwind.Resource()
+        this.resources.setCallback(La.curry(this.resourceCallback, this));
+        Emberwind.Resource.instance = this.resources;
+
         this.screenTransition = null;
         this.screenTransitions = [
             {
@@ -32,10 +44,22 @@ Laro.register('Emberwind', function (La) {
 				to: PKG.states.kStateTimetrap,
 				out: false,
 				transition: new La.ScreenTransitionFade(new La.Pixel32(255, 255, 255, 255), new La.Pixel32(255, 255, 255, 0), 0.25)
+			},
+            {
+                from: PKG.states.kStateTimetrap,
+				to: PKG.states.kStateMenu,
+				out: true,
+				transition: new La.ScreenTransitionFade(new La.Pixel32(255, 255, 255, 0), new La.Pixel32(255, 255, 255, 255), 0.25)
+            },
+			{
+				from: PKG.states.kStateTimetrap,
+				to: PKG.states.kStateMenu,
+				out: false,
+				transition: new La.ScreenTransitionFade(new La.Pixel32(255, 255, 255, 255), new La.Pixel32(255, 255, 255, 0), 0.25)
 			}
         ];
-		this.screenTransitionDefaultIn = new La.ScreenTransitionFade(new La.Pixel32(255, 255, 255, 255), new La.Pixel32(255, 255, 255, 0));
-		this.screenTransitionDefaultOut = new La.ScreenTransitionFade(new La.Pixel32(255, 255, 255, 0), new La.Pixel32(255, 255, 255, 255));
+		this.screenTransitionDefaultIn = new La.ScreenTransitionFade(new La.Pixel32(255, 255, 255, 255), new La.Pixel32(255, 255, 255, 0), 0.25);
+		this.screenTransitionDefaultOut = new La.ScreenTransitionFade(new La.Pixel32(255, 255, 255, 0), new La.Pixel32(255, 255, 255, 255), 0.25);
 
 		this.newState = -1;
 		this.newMessage = null;
@@ -47,13 +71,13 @@ Laro.register('Emberwind', function (La) {
 		this.stateMode = this.stateModes.kStateActive;
 
         this.render = null;
-		this.fillScreen = true;
 		Game.instance = this;
-		this.initialized = false;
 
 		this.createRender();
         this.resources.init();
-      //  console.log(this.resources)
+        
+        this.keyboard = new La.Keyboard();
+
     }).methods({
 		getInstance: function () {
 			if (!Game.instance) throw 'Game not init';
@@ -100,10 +124,10 @@ Laro.register('Emberwind', function (La) {
 						st.reset();
 						this.screenTransition = st;
 						this.stateMode = this.stateModes.kTransitionIn;
-                        console.log('----------- '+this.newState)
+                        //console.log('----------- '+this.newState)
 						this.fsm.setState(this.newState, this.newMessage);
 					} else {
-                    console.log('========')
+
 						this.screenTransition = null;
 						this.stateMode = this.stateModes.kStateActive;
 					}
@@ -144,11 +168,11 @@ Laro.register('Emberwind', function (La) {
          
             if (suspendCurrent || state == -1 || this.fsm.isSuspended(state)) {
                 this.fsm.setState(state, msg, suspendCurrent);
-            } else { console.log(66666666)
+            } else { 
                 var st = this.findScreenTransition(this.fsm.currentState, state, true);
 
                 if (st == null) st = this.findScreenTransition(this.fsm.currentState, -1, true);
-                if (st == null) st = this.screenTransitionsDefaultOut;
+                if (st == null) st = this.screenTransitionDefaultOut;
          
                 st.reset();
          

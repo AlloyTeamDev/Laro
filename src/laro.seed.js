@@ -11,6 +11,8 @@
         .register('exception', base + 'src/base/exception.js')
         .register('util', base + 'src/geometry/util.js')
         .register('perlin', base + 'src/geometry/perlin.js')
+		.register('sound', base + 'src/sound/sound.js').require(['class'])
+        .register('keyboard', base + 'src/input/keyboard.js').require(['class'])
         
         .register('point2', base + 'src/geometry/point2.js').require(['class', 'exception'])
         .register('vector2', base + 'src/geometry/vector2.js').require(['class', 'exception', 'point2'])
@@ -27,16 +29,16 @@
         .register('animation', base + 'src/actions/animation.js').require(['class', 'loop'])
         .register('animationHandle', base + 'src/actions/animation_handle.js').require(['animation'])
         
-        .register('resource', base + 'src/game/resource.class.js').require(['class', 'pixel32'])
+        .register('resource', base + 'src/game/resource.class.js').require(['class', 'pixel32', 'sound'])
         .register('state', base + 'src/game/state.js').require(['class', 'pixel32'])
         .register('fsm', base + 'src/game/fsm.js').require(['state'])
-        .register('laro', base + 'src/world/world.js').require(['class', 'exception', 'util', 'perlin', 'point2', 'vector2', 'chaikin', 'piexel32', 'rectf', 'imageW', 'layer', 'render', 'canvasRender', 'world', 'animation', 'animationHandle', 'resource', 'loop', 'state', 'fsm'])
+        .register('laro', base + 'src/world/world.js').require(['class', 'keyboard', 'sound', 'exception', 'util', 'perlin', 'point2', 'vector2', 'chaikin', 'piexel32', 'rectf', 'imageW', 'layer', 'render', 'canvasRender', 'world', 'animation', 'animationHandle', 'resource', 'loop', 'state', 'fsm'])
         
         
-        Laro.initialize = function (cb) {
+        /*Laro.initialize = function (cb) {
             Laro.multiModule(['class', 'exception', 'util', 'perlin', 'point2', 'vector2', 'chaikin', 'piexel32', 'rectf', 'imageW', 'layer', 'render', 'canvasRender', 'world', 'animation', 'animationHandle', 'resource', 'loop', 'state', 'fsm'], function () {
                 console.log('Laro initialized :)', Laro);
                 cb && cb();
             });
-        }
+        }*/
 })();

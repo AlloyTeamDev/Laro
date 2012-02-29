@@ -51,6 +51,11 @@ Laro.register('Emberwind', function (La) {
 			this.loadedImages[setName] = imageset;
 			return imageset[imageName];
 		},
+        getSound: function (filename) { 
+            var loader = La.ResourceLoader.getInstance(); 
+            var loadedSounds = loader.loadedSounds;
+            return loadedSounds[filename];
+        },
 		loadImageset: function (setName) {
 			var is = null;
 			for (var i in this.imageSets) {
@@ -74,7 +79,7 @@ Laro.register('Emberwind', function (La) {
 				if (is.frames.hasOwnProperty(f)) {
 					var name = is.frames[f];
 					var source = sources[f];
-					console.log(filename)
+					//console.log(filename)
 					set[name] = this.getEMBImage(source, filename);
 				}
 			}
@@ -110,14 +115,14 @@ Laro.register('Emberwind', function (La) {
 			} else {
 				for (var i = 0; i < this.animations.length; i ++) {
 					var at = this.animations[i];
-					console.log(at.name, index)
+					//console.log(at.name, index)
 					if (at.name == index) {
 						anim = at;
 						break;
 					}
 				}
 			}
-			console.log(anim)
+			//console.log(anim)
 			if (anim == null) return null;
 
 			var atlas = this.atlases[anim.atlas];
