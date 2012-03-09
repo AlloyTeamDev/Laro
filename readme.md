@@ -2,7 +2,10 @@
 {a game engine base on html5}
 
 ## Examples ##
+[查看以下demo最好使用chrome  : )]
 http://hongru.github.com/proj/laro/examples/emberwind/
+
+http://hongru.github.com/proj/laro/examples/typeshot/index.html
 
 ## Test cases ##
 * [Canvas Transform](http://hongru.github.com/proj/laro/test/canvas.transform.html)
