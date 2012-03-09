@@ -2,7 +2,8 @@
 {a game engine base on html5}
 
 ## Examples ##
-[查看以下demo最好使用chrome  : )]
+[鏌ョ湅浠ヤ笅demo鏈�濂戒娇鐢╟hrome  : )]
+
 http://hongru.github.com/proj/laro/examples/emberwind/
 
 http://hongru.github.com/proj/laro/examples/typeshot/index.html
