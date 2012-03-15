@@ -48,7 +48,7 @@ relpath #输出的文件target会相对于此目录, 优先级高于全局变量
 allowext = ['png', 'jpg', 'jpeg', 'gif', 'js', 'css']
 
 #输出的文件target会相对于此目录，每次生成均会先删除此文件夹
-relPath = './public/'
+relPath = './build/'
 
 rules = {
 	'config' : {
@@ -75,6 +75,10 @@ rules = {
 	'all_css' : {
 		'source' : './tools/css_demo.qzmin',
 		'target' : './css/test.all.css',
+	},
+	'laro.0.1': {
+		'source' : './tools/laro.0.1.qzmin',
+		'target' : './laro.0.1.js'
 	}
 }
 
@@ -82,7 +86,7 @@ rules = {
 # 编译模式，
 # -default 必须，为默认编译模式，对按照后面数组规则顺序进行编译
 modes = {
-	'-default': ['config','js','css','all_js','all_css'],
+	'-default': ['laro.0.1'],
 	#'-dev': [],
 	#'-debug': [],
 	#'-test': [],
