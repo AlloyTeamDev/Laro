@@ -58,8 +58,8 @@ Laro.register('Emberwind', function (La) {
 				transition: new La.ScreenTransitionFade(new La.Pixel32(255, 255, 255, 255), new La.Pixel32(255, 255, 255, 0), 0.25)
 			}
         ];
-		this.screenTransitionDefaultIn = new La.ScreenTransitionFade(new La.Pixel32(255, 255, 255, 255), new La.Pixel32(255, 255, 255, 0), 0.25);
-		this.screenTransitionDefaultOut = new La.ScreenTransitionFade(new La.Pixel32(255, 255, 255, 0), new La.Pixel32(255, 255, 255, 255), 0.25);
+		this.screenTransitionDefaultIn = new La.ScreenTransitionFade(new La.Pixel32(255, 255, 255, 255), new La.Pixel32(255, 255, 255, 0), 1);
+		this.screenTransitionDefaultOut = new La.ScreenTransitionFade(new La.Pixel32(255, 255, 255, 0), new La.Pixel32(255, 255, 255, 255), 1);
 
 		this.newState = -1;
 		this.newMessage = null;
@@ -96,6 +96,8 @@ Laro.register('Emberwind', function (La) {
 			this.render = new La.CanvasRender(canvas, 1, false);
 			canvasParent.replaceChild(canvas, oldCanvas);
 			this.canvas = canvas;
+			
+			PKG.render = this.render;
 		},
 		resourceCallback: function () {
 			if (this.initialized) return;
@@ -185,4 +187,39 @@ Laro.register('Emberwind', function (La) {
     // interface
     this.Game = Game;
 
+});
+
+/**
+ * Camera of game
+ * 通常用来控制背景层的移动，让人感觉是摄像区域在移动
+ */
+Laro.register('Emberwind.camera', function (La) {
+	this.x = 0;
+	this.y = 0;
+	this.objects = [];
+	/*
+		{
+			name: ,
+			texture: ,
+			
+		}
+	*/
+	this.addObject = function (obj) {
+		this.objects.push(obj);
+	};
+	
+	this.update = function (dt) {
+		
+	};
+	this.draw = function (render) {
+	
+	};
+	this.left = function (dis) {
+		
+	};
+	this.right = function (dis) {
+		
+	}
+	
 })
+
