@@ -1,12 +1,14 @@
 #Laro#
-{ a Game Engine base on Html5 }
+a Game Engine base on Html5 
 
 ## Examples ##
-[查看以下demo最好使用chrome  : )]
+查看以下demo最好使用chrome  : )
 
 http://hongru.github.com/proj/laro/examples/emberwind/
 
 http://hongru.github.com/proj/laro/examples/typeshot/index.html
+
+http://hongru.github.com/proj/laro/examples/jxhome/
 
 ## Test cases ##
 * [Canvas Transform](http://hongru.github.com/proj/laro/test/canvas.transform.html)
