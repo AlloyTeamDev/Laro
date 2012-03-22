@@ -1,0 +1,21 @@
+{
+	projects: [
+		{
+			name: "Compile Laro",
+			target: "./combined/laro.fsm.js",
+			include: [
+				"../src/laro.global.js",
+				"../src/base/exception.js",
+				"../src/base/class.js",
+				"../src/geometry/pixel32.js",
+				"../src/game/state.js",
+				"../src/game/fsm.js",
+				"../src/game/game.util.js"
+			]
+		}
+	],
+	level: 0,
+	shrink: false,
+	encode: "utf-8",
+	comment: "Tecnent Web Tech Team"
+}
