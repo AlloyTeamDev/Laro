@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<meta charset="utf-8" />
+<title>collsion & movement</title>
+<style>
+canvas {display: block; border:1px solid #333}
+</style>
+<script src="../build/laro.0.1.js"></script>
+
+<script>
+// 适配
+var Vec2 = Laro.Vector2;
+</script>
+<script src="../src/movement/collision.js"></script>
+<script src="../src/movement/movement.js"></script>
+
+<canvas id="canvas"></canvas>
+<script>
+// test case
+Laro.register('Test', function (La) {
+	
+	this.init = function (id, w, h) {
+		this.canvas = document.getElementById(id);
+		this.canvas.width = w || 800;
+		this.canvas.height = h || 600;
+		this.render = new La.CanvasRender(this.canvas, 1, false);
+		
+		this.movement = new MovementComponent();
+		this.initMovement();
+		this.movement.DropToGround();
+		
+		this.looper = new La.Loop(this.looper, this);
+	}
+	
+	this.getCollision = function () {
+		var c = [];
+		c.push(new Circle(new Vec2(0, -20), 20));
+		c.push(new Circle(new Vec2(0, -40), 20));
+		return c;
+	};
+
+	this.initMovement = function () {
+		var geom = this.getCollision();
+		var provider = function () { return []};
+		this.movement.Init(9.82 * 50, this, geom, provider);
+	};
+	
+	this.looper = function (dt) {
+		this.update(dt);
+		this.draw();
+	}
+	
+	this.update = function (dt) {
+		this.movement.Update(dt);
+		this.pos = this.movement.position.copy();
+	}
+	
+	this.draw = function () {
+		this.render.clear();
+		this.render.drawRect(this.pos.x, this.pos.y, this.pos.x + 50, this.pos.y+50, 'red');
+	}
+})
+
+onload = function () {
+	Test.init('canvas');
+}
+</script>
+</html>
