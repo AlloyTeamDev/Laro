@@ -52,7 +52,9 @@ function CollisionContact(p, n, d, fn, usr, mat) {
  
  
 // ConvexShape ---------------------------------------------------------------
- 
+// 凸起物体类
+// type: 形状 Circle|Rect
+// mat: 质地
 function ConvexShape(type, mat) {
     this.type = type;
  
@@ -71,6 +73,7 @@ function ConvexShape(type, mat) {
  * Push a point to the convex shape
  *
  * @param {Vec2} v Point to be pushed
+ * 增加一个顶点
  */
 ConvexShape.prototype.PushPoint = function (v) {
     this.points.push(v);
@@ -95,6 +98,7 @@ ConvexShape.prototype.Clear = function () {
  * Getter for number of points in the shape
  *
  * @return {number} The number of points
+ * 顶点数目
  */
 ConvexShape.prototype.NumPoints = function () {
     return this.points.length;
@@ -104,6 +108,7 @@ ConvexShape.prototype.NumPoints = function () {
  * Add an offset vector to the shape
  *
  * @param {Vec2} v Vector to be added
+ * 偏移，移动
  */
 ConvexShape.prototype.Offset = function (v) {
     this.y_min += v.y;
@@ -119,6 +124,7 @@ ConvexShape.prototype.Offset = function (v) {
  * Flip the shape horizontally
  *
  * @param {number} x Where on shape to flip
+ * 横向翻转
  */
 ConvexShape.prototype.HFlip = function (x) {
     this.points.reverse();
@@ -131,6 +137,7 @@ ConvexShape.prototype.HFlip = function (x) {
  
 /**
  * Deep copy
+ * 生成一个新的拷贝
  */
 ConvexShape.prototype.DeepCopy = function () {
     var c = new ConvexShape(this.type, this.material);
@@ -145,7 +152,7 @@ ConvexShape.prototype.DeepCopy = function () {
  
  
 // LineSegment2  -------------------------------------------------------------
- 
+// 线段 start end [Point]
 function LineSegment2(s, e) {
     this.a = new Vec2(s.x, s.y);
     this.b = new Vec2(e.x, e.y);
@@ -153,6 +160,7 @@ function LineSegment2(s, e) {
  
 // @param {Vec2} p
 // @return {Vec2}
+// 获取线段上 到指定点p 最短距离的点
 LineSegment2.prototype.GetClosestPoint = function (p) {
     var val = this.GetProjectionParam(p);
     // Clamp
@@ -168,14 +176,16 @@ LineSegment2.prototype.GetClosestPoint = function (p) {
  
 // @param {Vec2} p
 // @return {number}
+// 获取距离p点最短距离的点 的 比例
 LineSegment2.prototype.GetProjectionParam = function (p) {
     var m = this.b.copy().sub(this.a); // m = b - a
     var proj = p.copy().sub(this.a); // p - a
-    return m.Dot(proj) / m.Dot(m); // m.(p-a) / m.m
+    return m.dot(proj) / m.dot(m); // m.(p-a) / m.m
 };
  
 // @param {Vec2} p
 // @return {number}
+// 得到 p 点到线段的最短距离
 LineSegment2.prototype.GetProjectionDistance = function (p) {
     var p_ = new Vec2(p.x, p.y);
     p_.sub(this.GetClosestPoint(p));
@@ -206,6 +216,7 @@ function Signed2DTriArea(pointA, pointB, pointC) {
  * @param {Ray2}   ray      Ray for intersecting
  * @param {Circle} circle   Circle to be intersected
  * @return {boolean}        If the ray intersects the sphere
+ * 判断 射线与 圆 是否相交
  */
 function IntersectRaySphere(ray, circle) {
     closure = function () {
@@ -215,9 +226,9 @@ function IntersectRaySphere(ray, circle) {
     var m = new Vec2(ray.point.x, ray.point.y);
     m.sub(circle.c);
  
-    var a = ray.normal.Dot(ray.normal);
-    var b = m.Dot(ray.normal);
-    var c = m.Dot(m) - circle.r * circle.r;
+    var a = ray.normal.dot(ray.normal);
+    var b = m.dot(ray.normal);
+    var c = m.dot(m) - circle.r * circle.r;
  
     // Is the ray heading towards the circle? Otherwise it won't intersect
     if (c > 0 && b > 0) {
@@ -248,6 +259,7 @@ function IntersectRaySphere(ray, circle) {
  * @param {LineSegment2} a Line A
  * @param {LineSegment2} b Line B
  * @return {Object} An object is returned with intersection point and time if they intersect, otherwise null.
+ * 判断两条线段是否相交，如果是，返回交点，和相交次数， 否则返回null
  */
 function IntersectLineSegments(a, b) {
     var a1 = Signed2DTriArea(a.a, a.b, b.b);
@@ -291,6 +303,7 @@ function Collisions(cts, it) {
  * @param {Vec2}        movement      Vector describing movement
  * @param {ConvexShape} shape         Shape to be tested against
  * @return {Collisions}               Collision objects that holds both contact points and intersection time.
+ * 判断一个移动的圆 和 不规则凸起形状的碰撞相交关系，如果相交，返回关联的点和 相交次数
  */
 function GetCollisionShape(circle, movement, shape) {
     var contactPoints = [];
@@ -311,11 +324,11 @@ function GetCollisionShape(circle, movement, shape) {
  
             // last & curr is now start and end points of the line.
             var normal = new Vec2(-(curr.y - last.y), curr.x - last.x);
-            if (0 < normal.Dot(movement)) { 
+            if (0 < normal.dot(movement)) { 
                 continue; 
             }
  
-            normal.Normalize();
+            normal.normalize();
  
             // last = last + normal * (circle.r + SWEEP_EPSILON)
             var _last = new Vec2(normal.x, normal.y);
@@ -372,7 +385,7 @@ function GetCollisionShape(circle, movement, shape) {
                     _normal.mul(localIntersectionTime);
                     _normal.sub(pt[i]);
                     _normal.add(circle.c);
-					_normal.Normalize();
+					_normal.normalize();
  
                     // Contact point is the vertex.
                     // Normal is vector from corner to position of sphere at collision time.
@@ -401,6 +414,7 @@ function GetCollisionShape(circle, movement, shape) {
  * @param {Circle} circleB
  * @param {Vec2}   movementB
  * @return {Collisions}  Collision objects that holds both contact points and intersection time.
+ * 两个移动的圆的 相交 关系
  */
 function GetCollisionSphere(circleA, movementA, circleB, movementB) {
     // Calculating the sum of the movement of the two circles. The test is reduced
@@ -423,7 +437,7 @@ function GetCollisionSphere(circleA, movementA, circleB, movementB) {
         var contactPoint = new CollisionContact();
  
         // Normal is line between centers at collision time.
-        // contactPoint.normal = ((circleA.c + localCollisionTime * movementA) - (circleB.c + localCollisionTime * movementB)).Normalize();
+        // contactPoint.normal = ((circleA.c + localCollisionTime * movementA) - (circleB.c + localCollisionTime * movementB)).normalize();
         var rhs = new Vec2(movementB.x, movementB.y); // RHS of -
         rhs.mul(localCollisionTime);
         rhs.add(circleB.c);
@@ -433,7 +447,7 @@ function GetCollisionSphere(circleA, movementA, circleB, movementB) {
         contactPoint.normal.add(circleA.c);
  
         contactPoint.normal.sub(rhs);
-        contactPoint.normal.Normalize();
+        contactPoint.normal.normalize();
  
         // Collision point.
         // contactPoint.point = (circleB.c + localCollisionTime * movementB) + contactPoint.normal * circleB.r;
@@ -462,6 +476,7 @@ function GetCollisionSphere(circleA, movementA, circleB, movementB) {
  * @param [ConvexShape]         shapes
  *
  * @return {[CollisionContact]}  contactPoints
+ * 圆是否穿透 某个凸起物
  */
 function GetPenetrations(circle, pos, shapes) {
     var contactPoints = [];
@@ -480,19 +495,19 @@ function GetPenetrations(circle, pos, shapes) {
                 var contactVector = new Vec2(closestPoint.x, closestPoint.y);
                 contactVector.sub(circlePos);
  
-                if (contactVector.Dot(contactVector) <= ((circle.r + PENETRATION_EPSILON) * (circle.r + PENETRATION_EPSILON))) {
+                if (contactVector.dot(contactVector) <= ((circle.r + PENETRATION_EPSILON) * (circle.r + PENETRATION_EPSILON))) {
                     var depth = (circle.r + SWEEP_EPSILON) - contactVector.Magnitude();
  
                     // faceNormal = last - curr
                     var faceNormal = new Vec2(last.x, last.y);
                     faceNormal.sub(curr);
                     faceNormal.y *= -1;
-                    faceNormal.Normalize();
+                    faceNormal.normalize();
  
                     contactVector.mul(-1);
  
                     var contact = new CollisionContact(closestPoint, contactVector, depth, faceNormal, shapes[i].user, shapes[i].material);
-                    contact.normal.Normalize();
+                    contact.normal.normalize();
  
                     contactPoints.push(contact);
                 }

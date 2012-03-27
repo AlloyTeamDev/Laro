@@ -2,12 +2,13 @@
  * JCanvas
  * 给canvas里面图形加上常用事件代理
  * @author horizon
- * clone from https://github.com/hongru/JCanvas
- * 可代替对于鼠标事件的部分处理
  */
 
-(function () {
- 	
+;;;(function () {
+ 	// mobile navigator
+	var isTouchDevice = (/andriod|iphone|ipad/.test(navigator.userAgent.toLowerCase()));
+	
+	
  	var initializing = false,
 		superTest = /horizon/.test(function () {horizon;}) ? /\b_super\b/ : /.*/;
 	// 临时Class
@@ -220,23 +221,48 @@
 				dispatchMouseEvent: function (type, x, y) {
 					var mouseX = x, mouseY = y;
 					var _hoverChildren = [];
-					for (var i=0; i<this.children.length; i++) {
-						if (!!this.children[i].dispatchMouseEvent) {
-							this.children[i].dispatchMouseEvent(type, mouseX-this.children[i].x, mouseY-this.children[i].y);
+                    // check isMouseover
+                    function isMouseover (child) {
+                        var ret = false;
+                        // checkType  rect|circle|poly
+                        if (!child.checkType) {
+                            child.checkType = 'rect';
+                        }
+                        switch (child.checkType) {
+                            case 'rect':
+                                ret = (mouseX > child.x 
+                                        && mouseX < child.x + child.width
+                                        && mouseY > child.y
+                                        && mouseY < child.y + child.height);
+                                break;
+                            case 'circle':
+                                if (typeof child.radius != 'number') { throw 'no radius or radius is not a number' }
+                                ret = (Math.sqrt(Math.pow((mouseX-child.x) ,2) + Math.pow((mouseY-child.y) ,2)) < child.radius);
+                                break;
+                            case 'poly':
+                                // to be continue...
+                                break;
+                        }
+                        return ret;
+                    }
+                    
+					for (var i=0; i<this.children.length; i++) { 
+                        var child = this.children[i];
+						if (!!child.dispatchMouseEvent) {
+							child.dispatchMouseEvent(type, mouseX-child.x, mouseY-child.y);
 						}
 						//鼠标悬浮于子对象上面
-						if (mouseX > this.children[i].x && mouseX < this.children[i].x + this.children[i].width
-							&& mouseY > this.children[i].y && mouseY < this.children[i].y + this.children[i].height) {
-							type == 'mousemove' && _hoverChildren.push(this.children[i]);
+						if (isMouseover(child)) {
+							type == 'mousemove' && _hoverChildren.push(child);
 						
-						if (this.children[i].eventListener[type] == null
-							|| this.children[i].eventListener[type] == undefined) {
-							continue; // 没有事件监听器
-						}
-						// 有事件监听则遍历执行
-						for (var j=0, arr=this.children[i].eventListener[type]; j < arr.length; j++) {
-							arr[j](mouseX-this.children[i].x, mouseY-this.children[i].y);
-						}
+                            if (child.eventListener[type] == null
+                                || child.eventListener[type] == undefined) {
+                                continue; // 没有事件监听器
+                            }
+                            // 有事件监听则遍历执行
+                            for (var j=0, arr=child.eventListener[type]; j < arr.length; j++) {
+                                arr[j](mouseX-child.x, mouseY-child.y);
+                            }
 						}
 					};
 					if (type != 'mousemove') {
@@ -350,9 +376,17 @@
 						return function (e) { 
                             var offset = getOffset(),
                                 winScroll = getWindowScroll();
-
-							var x = e.clientX - offset.left + winScroll.x,
-								y = e.clientY - offset.top + winScroll.y;
+							
+							if (isTouchDevice) {
+								e.preventDefault();
+								var touch = evArr[i] == 'touchend' ? e.changedTouches[0] : e.touches[0];
+								var x = touch.pageX - offset.left + winScroll.x,
+									y = touch.pageY - offset.top + winScroll.y;
+							} else {
+								var x = e.clientX - offset.left + winScroll.x,
+									y = e.clientY - offset.top + winScroll.y;
+							}
+							
 							if (!!param.eventListener[evArr[i]]) {
 								for (var j=0; j<param.eventListener[evArr[i]].length; j++) {
 									param.eventListener[evArr[i]][j](x, y);
@@ -376,7 +410,7 @@
 							}(context, i), false);
 				}
 			};
-			batchAddMouseEventListener(this.canvas, ['mousemove', 'mouseup', 'mousedown', 'click', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave']);	
+			batchAddMouseEventListener(this.canvas, ['mousemove', 'mouseup', 'mousedown', 'click', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave', 'touchstart', 'touchmove', 'touchend']);	
 			batchAddKeyEventListener(this.canvas, ['keyup', 'keydown', 'keypress']);
 		},
 		onRefresh: function () {},
@@ -394,17 +428,17 @@
 		contains: function (child) { return this._super(child) },
 		dispatchMouseEvent: function (type, x, y) { return this._super(type, x, y) },
 		clearHoverChildren: function () { return this._super() },
-		render: function () {
+		render: function (rd) { 
 			// 重绘
 			!!this.CONFIG.isClear && this.clear();
 			// 画舞台
 			//console.log(this.children)
-			this.draw();
+			this.draw(rd);
 			// 画舞台元素
 			for (var i=0; i<this.children.length; i++) {
 				// 坐标系移到对应位置
 				this.ctx.translate(this.children[i].x, this.children[i].y);
-				this.children[i].render();
+				this.children[i].render(rd);
 				this.ctx.translate(-this.children[i].x, -this.children[i].y);
 			}
 		},
@@ -466,8 +500,8 @@
 		contains: function (child) { return this._super(child) },
 		dispatchMouseEvent: function (type, x, y) { return this._super(type, x, y) },
 		clearHoverChildren: function () { return this._super() },
-		render: function () {
-			this.draw();
+		render: function (rd) {
+			this.draw(rd);
 			// 强制缩放，保证子对象不会比自己大
 			this.ctx.scale(
 						this.width < this.maxWidth ? this.width/this.maxWidth : 1,
@@ -476,7 +510,7 @@
 			// 绘制子对象
 			for (var i=0; i<this.children.length; i++) {
 				this.ctx.translate(this.children[i].x, this.children[i].y);
-				this.children[i].render();
+				this.children[i].render(rd);
 				this.children[i].translate(-this.children[i].x, this.children[i].y);
 			}
 			this.ctx.scale(
@@ -967,6 +1001,7 @@
 		}
     });
 
+    // add to Laro, so check if Laro is available
     if (this.Laro && Laro.extend) {
         Laro.extend(CVS);
     } else {

@@ -39,7 +39,7 @@ Laro.use('resource', function () {
     
     function myCallback (progress) {
         console.log(progress);
-        document.write(progress*100 + '%' loaded!);
+        document.write(progress*100 + '% loaded!');
         if (progress == 1) {
             alert('all resources loaded');
             console.log(loader.loadedImages)

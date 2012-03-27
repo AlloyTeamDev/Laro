@@ -80,6 +80,10 @@ rules = {
 		'source' : './tools/laro.0.1.qzmin',
 		'target' : './laro.0.1.js'
 	},
+	'laro.0.2': {
+		'source' : './tools/laro.0.2.qzmin',
+		'target' : './laro.0.2.js'
+	},
 	'laro.fsm': {
 		'source' : './tools/laro.fsm.qzmin',
 		'target' : './solo_parts/laro.fsm.js'
@@ -90,7 +94,7 @@ rules = {
 # 编译模式，
 # -default 必须，为默认编译模式，对按照后面数组规则顺序进行编译
 modes = {
-	'-default': ['laro.0.1', 'laro.fsm'],
+	'-default': ['laro.0.1', 'laro.fsm', 'laro.0.2'],
 	#'-dev': [],
 	#'-debug': [],
 	#'-test': [],

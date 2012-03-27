@@ -33,4 +33,8 @@ Laro 游戏引擎目前已经完成了游戏开发中所需要的模块和api的
 目前已经开源到github （https://github.com/hongru/Laro）
 
 我们团队希望通过Laro的不断完善，能够帮助更多的html5 小游戏开发者以更快的速度，更优的质量完成 html5小游戏 产业化的开发。
+
+#### Version Log ####
+- 0.1 - 基础模块搭建
+- 0.2 - 融入jcanvas，配合鼠标事件处理
  
