@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+<meta charset="utf-8" />
+<title>collsion & movement</title>
+<style>
+canvas {display: block; border:1px solid #333; margin:0 auto;}
+</style>
+<script src="../build/laro.0.2.js"></script>
+
+<script>
+// 适配
+var Vec2 = Laro.Vector2;
+</script>
+<script src="../src/movement/collision.js"></script>
+
+<canvas id="canvas"></canvas>
+<script>
+// test case
+Laro.register('Test', function (La) {
+	
+	this.init = function (id, w, h) {
+		this.canvas = document.getElementById(id);
+		this.canvas.width = w || 800;
+		this.canvas.height = h || 600;
+		this.render = new La.CanvasRender(this.canvas, 1, false);
+		this.stage = new La.$stage(this.canvas);
+		this.stage.CONFIG.isClear = false;
+		
+		Test.LineSegment2.init();
+		
+		this.pos = new Vec2(0, 0);
+		this.looper = new La.Loop(this.looper, this);
+		
+		
+	}
+	
+	this.looper = function (dt) {
+		this.update(dt);
+		this.draw();
+	}
+	
+	this.update = function (dt) {
+		//this.pos = this.pos.add(this.movement);
+	}
+	
+	this.draw = function () {
+		this.render.clear();
+
+		Test.LineSegment2.draw();
+		this.stage.render(this.render);
+	}
+
+	
+});
+
+Laro.register('Test.LineSegment2', function (La) {
+	this.init = function () {
+		this.addLSPoints();
+		this.addP();
+		this.line();
+	};
+	this.addP = function () {
+		this.p = new La.$sprite(Test.stage.ctx, function () {
+			this.radius = 5;
+			this.checkType = 'circle';
+			this.x = 300;
+			this.y = 300;
+			this.color = 'green';
+			this.draw = function (render) {
+				this.ctx.beginPath();
+				this.ctx.arc(0, 0, this.radius, 0, Math.PI*2, true);				
+				this.ctx.closePath();
+				this.ctx.fillStyle = this.color;
+				this.ctx.fill();
+			}
+		});
+		var _this = this;
+		this.p.addEventListener('mousedown', function () {
+			_this.p.mousedown = true;
+		});
+		
+		Test.stage.addChild(this.p);
+	};
+	this.addLSPoints = function () {
+		var a = new La.$sprite(Test.stage.ctx, function () {
+			this.radius = 5;
+			this.checkType = 'circle';
+			this.x = 100;
+			this.y = 100;
+			this.color = 'black';
+			this.draw = function (render) {
+				this.ctx.beginPath();
+				this.ctx.arc(0, 0, this.radius, 0, Math.PI*2, true);				
+				this.ctx.closePath();
+				this.ctx.strokeStyle = this.color;
+				this.ctx.stroke();
+			}
+		});
+		var b = new La.$sprite(Test.stage.ctx, function () {
+			this.radius = 5;
+			this.checkType = 'circle';
+			this.x = 300;
+			this.y = 100;
+			this.color = 'black';
+			this.draw = function (render) {
+				this.ctx.beginPath();
+				this.ctx.arc(0, 0, this.radius, 0, Math.PI*2, true);				
+				this.ctx.closePath();
+				this.ctx.strokeStyle = this.color;
+				this.ctx.stroke();
+			}
+		});
+		a.addEventListener('mousedown', function () {
+			a.mousedown = true;
+		});
+		b.addEventListener('mousedown', function () {
+			b.mousedown = true;
+		});
+		Test.stage.addEventListener('mousemove', function (x, y) {
+			for (var i = 0; i < Test.stage.children.length; i ++) {
+				var child = Test.stage.children[i];
+				if (child.mousedown) {
+					child.x = x;
+					child.y = y;
+				}
+			}
+		});
+		Test.stage.addEventListener('mouseup', function () {
+			for (var i = 0; i < Test.stage.children.length; i ++) {
+				var child = Test.stage.children[i];
+				child.mousedown = false;
+			}
+		});
+		
+		Test.stage.addChild(a);
+		Test.stage.addChild(b);
+		this.a = a;
+		this.b = b;
+	};
+	
+	this.line = function () {
+		var ctx = Test.stage.ctx;
+		ctx.moveTo(this.a.x, this.a.y);
+		ctx.lineTo(this.b.x, this.b.y);
+		ctx.strokeStyle = '#000';
+		ctx.stroke();
+		
+		this.ls2 = new LineSegment2(this.a, this.b);
+		this.getClosetP();
+	};
+	this.getClosetP = function () {
+		this.cp = this.ls2.GetClosestPoint(new Vec2(this.p.x, this.p.y));
+		this.drawCP();
+	};
+	this.drawCP = function () {
+		var ctx = Test.stage.ctx;
+
+		ctx.beginPath();
+		ctx.arc(this.cp.x, this.cp.y, 5, 0, Math.PI*2, true);
+		ctx.fillStyle = 'red';
+		ctx.closePath();
+		ctx.fill();
+	};
+	
+	this.draw = function () {
+		this.line();
+	}
+})
+
+onload = function () {
+	Test.init('canvas');
+}
+</script>
+</html>
