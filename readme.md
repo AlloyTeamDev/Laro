@@ -10,6 +10,8 @@ http://hongru.github.com/proj/laro/examples/typeshot/index.html
 
 http://hongru.github.com/proj/laro/examples/jxhome/
 
+http://heroes.github.com/world-of-heroes/stable/
+
 ## Test cases ##
 * [Canvas Transform](http://hongru.github.com/proj/laro/test/canvas.transform.html)
 * [Chaikin Curve](http://hongru.github.com/proj/laro/test/laro.chaikin_curve.html)
