@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<meta charset="utf-8" />
+<style>
+canvas {display: block; border:1px solid #333; margin:0 auto;}
+</style>
+<script src="../build/laro.0.2.js"></script>
+<script>
+// 适配
+var Vec2 = Laro.Vector2;
+</script>
+<script src="../src/movement/collision.js"></script>
+
+<canvas id="canvas"></canvas>
+<script>
+Laro.register('CO', function (La) {
+
+	this.init = function (id, w, h) {
+		this.canvas = document.getElementById(id);
+		this.canvas.width = w || 800;
+		this.canvas.height = h || 600;
+		this.render = new La.CanvasRender(this.canvas, 1, false);
+		this.stage = new La.$stage(this.canvas);
+		this.stage.CONFIG.isClear = false;
+		
+		this.createCircle();
+		this.createConvex();
+		
+		this.movement = new Vec2(5, 5);		
+		
+		this.looper = new La.Loop(this.looper, this);
+		
+	};
+	
+	this.createCircle = function () {
+		this.pos = new Vec2(0, 0);
+		this.circle = new Circle(this.pos, 10);
+	};
+	this.createConvex = function () {
+		this.convex = new ConvexShape();
+		this.convex.PushPoint(new Vec2(400, 400));
+		this.convex.PushPoint(new Vec2(450, 400));
+		this.convex.PushPoint(new Vec2(450, 450));
+		this.convex.PushPoint(new Vec2(400, 450));
+	};
+	
+	this.looper = function (dt) {
+		this.update(dt);
+		this.draw();
+	};
+	
+	this.update = function (dt) {
+		this.pos = this.pos.add(this.movement);
+		this.cs = GetCollisionShape(this.circle, this.movement, this.convex)
+	};
+	
+	this.draw = function () {
+		this.render.clear();
+		this.stage.render(this.render);
+		
+		if (this.cs) {
+			this.movement.mul(-1);
+		}
+		this.drawCircle();
+		this.drawConvex();
+	}
+	
+	this.drawCircle = function () {
+		this.render.drawCircle(this.pos.x, this.pos.y, this.circle.r, '#333');
+	}
+	
+	this.drawConvex = function () {
+		var ctx = this.render.context;
+		ctx.beginPath();
+		ctx.moveTo(this.convex.points[0].x, this.convex.points[0].y);
+		
+		for (var i = 1; i < this.convex.points.length; i ++) {
+			var p = this.convex.points[i];
+			ctx.lineTo(p.x, p.y);
+		}
+		ctx.lineTo(this.convex.points[0].x, this.convex.points[0].y);
+		ctx.closePath();
+		ctx.strokeStyle = '#000';
+		ctx.stroke();
+	}
+});
+
+onload = function () {
+	CO.init('canvas')
+}
+</script>
+</html>
