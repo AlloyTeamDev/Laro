@@ -189,7 +189,7 @@ LineSegment2.prototype.GetProjectionParam = function (p) {
 LineSegment2.prototype.GetProjectionDistance = function (p) {
     var p_ = new Vec2(p.x, p.y);
     p_.sub(this.GetClosestPoint(p));
-    return p_.Magnitude();
+    return p_.magnitude();
 };
  
 // ---------------------------------------------------------------------------
