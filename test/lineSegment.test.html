@@ -11,7 +11,7 @@ canvas {display: block; border:1px solid #333; margin:0 auto;}
 // 适配
 var Vec2 = Laro.Vector2;
 </script>
-<script src="../src/movement/collision.js"></script>
+<script src="../src/movement/laro.collision.js"></script>
 
 <canvas id="canvas"></canvas>
 
@@ -152,14 +152,14 @@ Laro.register('Test.LineSegment2', function (La) {
 		ctx.strokeStyle = '#000';
 		ctx.stroke();
 		
-		this.ls2 = new LineSegment2(this.a, this.b);
+		this.ls2 = new La.LineSegment2(this.a, this.b);
 		this.getClosetP();
 	};
 	this.getClosetP = function () {
 		var p = new Vec2(this.p.x, this.p.y)
-		this.cp = this.ls2.GetClosestPoint(p);
-		this.param = this.ls2.GetProjectionParam(p);
-		this.dis = this.ls2.GetProjectionDistance(p);
+		this.cp = this.ls2.getClosestPoint(p);
+		this.param = this.ls2.getProjectionParam(p);
+		this.dis = this.ls2.getProjectionDistance(p);
 		
 		this.drawCP();
 	};
