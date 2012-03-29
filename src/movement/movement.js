@@ -17,6 +17,11 @@ var kMaxDropHeight = 1000;
 var kDropEpsilon = 1.0;
 var kWallAngle = 0.866; // cos(30 degrees)
  
+var Vec2 = Laro.Vector2,
+	Circle = Laro.Circle,
+	GetPenetrations = Laro.getPenetrations,
+	CollisionContact = Laro.CollisionContact,
+	GetCollisionShape = Laro.getCollisionShape
  
 /**
  * MovementComponent class held by a game object
@@ -243,7 +248,7 @@ BaseMovementComponent.prototype.FixedPosTest = function (pos, epsilon, shapes) {
                 
                 var tmp2 = new Vec2(ctc[c].point.x, ctc[c].point.y);
                 tmp2.sub(ctc[t].point);
-                if (Math.abs(tmp2.Dot(ctc[c].faceNormal)) < 0.001) { // Magic constant, wat is dis
+                if (Math.abs(tmp2.dot(ctc[c].faceNormal)) < 0.001) { // Magic constant, wat is dis
                     if (ctc[c].depth < ctc[t].depth) {
                         ctc[c] = ctc[t];
                     }
@@ -399,7 +404,7 @@ BaseMovementComponent.prototype.ClipToContacts = function (v, bouncyness) {
             avgNorm.add(c.normal);
  
             // Project on normal
-            var normProj = result.Dot(c.normal);
+            var normProj = result.dot(c.normal);
  
             // If vector is moving towards the contact, remove that part of the vector
             // we then add a tiny bit of away to make it non-stick.
@@ -487,7 +492,7 @@ BaseMovementComponent.prototype.GetSlope = function () {
     var avg = new Vec2(0, 0);
     var dwn = new Vec2(0, -1);
     for (var i = 0; i < this.contacts.length; i++) {
-        if (dwn.Dot(this.contacts[i].normal) > 0) {
+        if (dwn.dot(this.contacts[i].normal) > 0) {
             avg.add(this.contacts[i].normal);
         }
     }
@@ -495,7 +500,7 @@ BaseMovementComponent.prototype.GetSlope = function () {
     if (len > 0) {
         avg.div(len);
     }
-    var ang = Math.acos(avg.Dot(dwn));
+    var ang = Math.acos(avg.dot(dwn));
  
     return avg.x < 0 ? -ang : ang;
 };
@@ -508,7 +513,7 @@ BaseMovementComponent.prototype.GetSlope = function () {
 BaseMovementComponent.prototype.IsOnFloor = function () {
     for (c_it = 0; c_it < this.contacts.length; c_it++) {
         var c = this.contacts[c_it];
-        if ((c.normal.Dot(new Vec2(0, -1)) > kWalkableAngle) && (c.normal.Dot(this.velocity) < kMinJumpSpeed)) {
+        if ((c.normal.dot(new Vec2(0, -1)) > kWalkableAngle) && (c.normal.dot(this.velocity) < kMinJumpSpeed)) {
             return true;
         }
     }
@@ -529,7 +534,7 @@ BaseMovementComponent.prototype.IsNearFloor = function (limit, mode) {
     var to = new Vec2(0, 1); to.mul(limit); to.add(this.position); // pos + YAxis * limit
     var sweepRes = this.SweepTest(this.position, to);
     if (sweepRes.foundCollision) {
-        if (sweepRes.contact.normal.Dot(new Vec2(0, -1)) > kWalkableAngle) {
+        if (sweepRes.contact.normal.dot(new Vec2(0, -1)) > kWalkableAngle) {
             result = true;
         }
     }
@@ -554,8 +559,8 @@ BaseMovementComponent.prototype.IsFacingWall = function (left) {
 	var res = this.SweepTest(from, to);
  
 	if (res.foundCollision && res.contactTime <= 1) {
-		if ((res.contact.normal.Dot(new Vec2(left ? 1 : -1, 0)) > kWallAngle) &&
-		  (res.contact.normal.Dot(this.velocity) <= 0)) {
+		if ((res.contact.normal.dot(new Vec2(left ? 1 : -1, 0)) > kWallAngle) &&
+		  (res.contact.normal.dot(this.velocity) <= 0)) {
 			return true;
 		}
 	}
@@ -571,7 +576,7 @@ BaseMovementComponent.prototype.IsFacingWall = function (left) {
  */
 BaseMovementComponent.prototype.IsHittingWall = function (left) {
 	for (var i = 0; i < this.contacts.length; i++) {
-		if (this.contacts[i].normal.Dot(new Vec2(left ? 1 : -1, 0)) > kWallAngle) {
+		if (this.contacts[i].normal.dot(new Vec2(left ? 1 : -1, 0)) > kWallAngle) {
 			return true;
 		}
 	}

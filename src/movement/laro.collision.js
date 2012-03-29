@@ -175,6 +175,7 @@ Laro.register('.collision', function (La) {
 	// 用于帮助检测 碰撞
 	/**
 	 * Helper area calculation function. Returns 2 X the area.
+	 * 三角形外积
 	 *
 	 * @param  {Vec2} pointA
 	 * @param  {Vec2} pointB
@@ -303,6 +304,7 @@ Laro.register('.collision', function (La) {
 				var curr = i+1 === pt.length ? pt[0] : pt[i+1];
 	 
 				// last & curr is now start and end points of the line.
+				// 远离
 				var normal = new Vec2(-(curr.y - last.y), curr.x - last.x);
 				if (0 < normal.dot(movement)) {
 					continue; 
