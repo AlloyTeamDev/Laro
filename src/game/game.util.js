@@ -9,14 +9,14 @@ Laro.register('.game', function (La) {
     /**
      * Provides requestAnimationFrame in a cross browser way.
      */
-    window.requestAnimationFrame = this.requestAnimationFrame =  (function() {
+    window.requestAnimFrame = this.requestAnimFrame =  (function() {
       return window.requestAnimationFrame ||
              window.webkitRequestAnimationFrame ||
              window.mozRequestAnimationFrame ||
              window.oRequestAnimationFrame ||
              window.msRequestAnimationFrame ||
              function(/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
-               window.setTimeout(callback, 1);
+               window.setTimeout(callback, 1000/60);
              };
     })();
     
@@ -26,7 +26,7 @@ Laro.register('.game', function (La) {
             
         function loop () {
             if (!keepUpdating) { return }
-            requestAnimationFrame(loop);
+            requestAnimFrame(loop);
             
             var time = new Date(),
                 dt = (time - lastLoopTime) / 1000;
