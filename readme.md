@@ -20,6 +20,9 @@ http://heroes.github.com/world-of-heroes/stable/
 * [Laro Animation 2](http://hongru.github.com/proj/laro/test/laro.fighter2.html)
 * [Laro Resource Loader](http://hongru.github.com/proj/laro/test/laro.resource.html)
 * [Laro input.animation](http://hongru.github.com/proj/laro/test/laro.input.animation.html)
+* [Collision - LineSegment](http://hongru.github.com/proj/laro/test/lineSegment.test.html)
+* [Collision - Simple Test](http://hongru.github.com/proj/laro/test/laro.collision.test2.html)
+* [Collision - Collision With Param](http://hongru.github.com/proj/laro/test/laro.collision.test3.html)
 
 ## Introduction ##
 随着html5 相关技术的兴起，因其跨平台的特性，和标准的日益完善。html5相关技术越来越多的被应用到前沿app的开发中，尤其是html5 小游戏的开发。
