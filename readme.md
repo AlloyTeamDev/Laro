@@ -23,6 +23,7 @@ http://heroes.github.com/world-of-heroes/stable/
 * [Collision - LineSegment](http://hongru.github.com/proj/laro/test/lineSegment.test.html)
 * [Collision - Simple Test](http://hongru.github.com/proj/laro/test/laro.collision.test2.html)
 * [Collision - Collision With Param](http://hongru.github.com/proj/laro/test/laro.collision.test3.html)
+* [A* demo](http://hongru.github.com/proj/laro/test/laro.astar.html)
 
 ## Introduction ##
 随着html5 相关技术的兴起，因其跨平台的特性，和标准的日益完善。html5相关技术越来越多的被应用到前沿app的开发中，尤其是html5 小游戏的开发。
