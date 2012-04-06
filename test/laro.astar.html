@@ -5,6 +5,10 @@
 <script src="../src/tools/astar.js"></script>
 
 <canvas id="canvas"></canvas>
+<p style="font-size:12px">
+点击放置障碍物（黑色方块），进行寻路测试。
+绿色方块为起点，红色方块为终点。
+</p>
 <script>
 Laro.register('AStarTest', function (La) {
 	var pkg = this;
@@ -32,7 +36,11 @@ Laro.register('AStarTest', function (La) {
 	
 	this.bind = function () {
 		this.stage.addEventListener('click', function (x, y) {
-			pkg.getIndexByPos(x, y);
+			var pos = pkg.getIndexByPos(x, y);
+			if (pos.join() == pkg.startPos.join() || pos.join() == pkg.endPos.join()) {
+				return false;
+			}
+			map[pos[0]][pos[1]] = (map[pos[0]][pos[1]] + 1)%2;
 			pkg.path = pkg.astarM.getPath(pkg.startPos, pkg.endPos);
 		});
 	};
@@ -47,7 +55,7 @@ Laro.register('AStarTest', function (La) {
 	this.getIndexByPos = function (x, y) {
 		var r = Math.floor(y/this.size),
 			c = Math.floor(x/this.size);
-		map[r][c] = (map[r][c]+1)%2;
+		return [r, c];
 	};
 	
 	this.looper = function (dt) {

@@ -39,13 +39,22 @@ Laro.register('.tools', function (La) {
 
 	/**
 	 * 所有用于寻路算法的mapMatrix,这里都简化成可通过，和不可通过两种方式
-	 * 可通过统一用 0 ，不可通过统一 用 1
+	 * 可通过统一用 0 ，不可通过统一 用 大于0的数字表示
 	 * 所以在使用以下方法时，可能需要先 将 你的mapMatrix 格式化一下
 	 */
-	var AStar = La.Class(function (mapMatrix) {
+	var AStar = La.Class(function (mapMatrix, whiteList) {
 		this.mapMatrix = mapMatrix;
 		this.mmRow = mapMatrix.length;
 		this.mmCol = mapMatrix[0].length;
+		// 用于处理可以斜着穿透拐角的白名单，默认都是不可斜穿
+		if (whiteList == undefined) {
+			whiteList = [];
+		}
+		this.whiteList = whiteList;
+		this._whiteHash = {};
+		for (var i = 0; i < this.whiteList.length; i ++) {
+			this._whiteHash[this.whiteList[i]] = 1;
+		}
 		
 	}).methods({
 		// startPos,endPos 分别表示寻路相对于mapMatrix的起始位置 和 结束位置
@@ -61,9 +70,9 @@ Laro.register('.tools', function (La) {
 			this.path = [];
 			
 			// whether startPos or endPos is out of mapMatrix, or not available;
-			if (this.mapMatrix[startPos[0]][startPos[1]] === 1
+			if (this.mapMatrix[startPos[0]][startPos[1]] > 0
 				|| this.mapMatrix[startPos[0]][startPos[1]] == undefined
-				|| this.mapMatrix[endPos[0]][endPos[1]] === 1
+				|| this.mapMatrix[endPos[0]][endPos[1]] > 0
 				|| this.mapMatrix[endPos[0]][endPos[1]] == undefined) {
 				return null;
 			} 
@@ -108,7 +117,10 @@ Laro.register('.tools', function (La) {
 						if (row[c] === 0) {
 							// available;
 							//in closeHash, continue;
-							if (this.closeHash[_pos.join('_')]) {
+							//or in corner rules, continue;
+							if (this.closeHash[_pos.join('_')]
+								|| (row[pos[1]] > 0 && !this._whiteHash[row[pos[1]]]) 
+								|| (this.mapMatrix[pos[0]][c] > 0 && !this._whiteHash[this.mapMatrix[pos[0]][c]])) {
 								continue;
 							}
 
@@ -131,7 +143,7 @@ Laro.register('.tools', function (La) {
 								}
 							}
 
-						} else if (row[c] === 1) {
+						} else if (row[c] > 0) {
 							this.closeHash[_pos.join('_')] = 1;
 						}
 					}
