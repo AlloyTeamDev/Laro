@@ -80,7 +80,6 @@ Leta.NS('LAE', function ($L) {
 
 			var dt = e.dataTransfer || e.originalEvent.dataTransfer;  
 			var files = dt.files; 
-			console.log(files)
 
 			pkg.handleFiles(files); 
 		});
@@ -94,9 +93,10 @@ Leta.NS('LAE', function ($L) {
 				continue;  
 			}  
 
+			// FileReader 不支持file协议
 			var reader = new FileReader();  
 			reader.onload = function(e){ 
-				console.log(e)
+				$('body').append($('<img alt="" src="'+e.target.result+'" />'))
 				//pkg.setFx('normal', e.target.result);
 			/*	var nodes = $L.$dom.create('<img src="'+e.target.result+'" />');
 				$L.$dom(nodes).appendTo(els.$con);
