@@ -36,7 +36,7 @@
 	<div class="doc">
 		<h1>Animation Editor</h1>
 		<div id="container" class="container noimg">
-			Drop an image here
+			Drag an image here
 		</div>
 	</div>
 </section>
@@ -46,6 +46,10 @@ Leta.NS('LAE', function ($L) {
 	var pkg = this;
 	var els = {};
 	var $E = $L.event;
+	var $ = function (sel) {
+		return (/^\s*<([^\s>]+)/).test(sel) ? $L.$dom($L.$dom.create(sel)) : $L.$dom($L.$qsa(sel));
+	};
+	this.$ = $;
 	
 	this.init = function () {
 		//alert($L.browser.msie)
@@ -53,11 +57,57 @@ Leta.NS('LAE', function ($L) {
 		this.bind();
 	};
 	this.getEls = function () {
-		els.con = $L.get('#container');
+		els.$con = $('#container');
 	};
 	this.bind = function () {
-		$E.on()
+		this.bindDragDrop();
+		
+	};
+	this.bindDragDrop = function () {
+		$E.on(els.$con[0], 'dragenter', function (e) {
+			e.preventDefault();
+			els.$con.addClass('dragover').html('Drop Here!');
+		});
+		$E.on(els.$con[0], 'dragover', function (e) {
+			e.preventDefault();
+		});
+		$E.on(els.$con[0], 'dragleave', function (e) {
+			e.preventDefault();
+			els.$con.removeClass('dragover').html('Drag an image here')
+		});
+		$E.on(els.$con[0], 'drop', function (e) {
+			e.preventDefault();
+
+			var dt = e.dataTransfer || e.originalEvent.dataTransfer;  
+			var files = dt.files; 
+			console.log(files)
+
+			pkg.handleFiles(files); 
+		});
+	};
+	this.handleFiles = function (files) {
+		for (var i = 0; i < files.length; i++) {  
+			var file = files[i];  
+			var imageType = /image.*/;  
+			  
+			if (!file.type.match(imageType)) {  
+				continue;  
+			}  
+
+			var reader = new FileReader();  
+			reader.onload = function(e){ 
+				console.log(e)
+				//pkg.setFx('normal', e.target.result);
+			/*	var nodes = $L.$dom.create('<img src="'+e.target.result+'" />');
+				$L.$dom(nodes).appendTo(els.$con);
+				els.$con.removeClass('dragover');
+				els.$con.removeClass('noimg');*/
+			}
+
+			reader.readAsDataURL(file);  
+		}  
 	}
+	
 });
 Leta.domReady(function () { LAE.init(); })
 </script>
