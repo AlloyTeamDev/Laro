@@ -1,5 +1,17 @@
-/**
- * Laro.base.class
+/** 
+ * Laro (Game Engine Based on Canvas) 
+ * Code licensed under the MIT License:
+ *
+ * @fileOverview Laro
+ * @version 1.0
+ * @author  Hongru
+ * @description 
+ * 
+ */
+ 
+/** 
+ * @description
+ * Package: Laro.base
  */
  
 Laro.register('.base', function (L) {
@@ -11,7 +23,41 @@ Laro.register('.base', function (L) {
         xyz
     }) ? /\bsupr\b/: /.*/,
     proto = 'prototype';
-
+	
+	/**
+     * 创建一个类
+     * 
+     * @memberOf Laro
+     * @function
+     * 
+     * @param {Function} o: 类的constructor， 也可以是一个Object字典，如果是这样，那么initialize默认为constructor，其他的methods
+	 * @example 
+	 * Man = Laro.Class(function (name) {
+			this.name = name;
+		}).methods({
+			walk: function () {
+				//todo
+			},
+			talk: function () {
+				//todo
+			}
+		});
+		
+		SuperMan = Man.extend(function (name, canfly) {
+			this.name = name;
+			this.canfly = canfly;
+		}).methods({
+			walk: function () {
+				this.supr();
+				// todo
+			},
+			fly: function () {
+				// todo
+			}
+		});
+     * 
+     * @return {Class} 返回一个类
+     */
     function Class(o) {
         return extend.call(isFn(o) ? o: function() {},
         o, 1);
@@ -39,6 +85,12 @@ Laro.register('.base', function (L) {
         }
     }
 
+	/**
+     * @lends Laro.Class(...)
+	 * @param {Function} o: 子类的constructor
+	 * @param {Boolean} fromSub: 不继承父类
+	 * @return {Class} 返回一个类的子类
+     */ 
     function extend(o, fromSub) {
         // must redefine noop each time so it doesn't inherit from previous arbitrary classes
         function noop() {}
