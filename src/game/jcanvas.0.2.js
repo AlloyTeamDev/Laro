@@ -507,6 +507,9 @@
 				this.ctx.translate(-this.children[i].x, -this.children[i].y);
 			}
 		},
+		/**
+		 * 擦除画布上一块
+		 */
 		clear: function (x, y, w, h) {
 			if (x !== undefined && y !== undefined && w !== undefined && h !== undefined) {
 				this.ctx.clearRect(x, y, w, h);
@@ -514,7 +517,9 @@
 				this.ctx.clearRect(0, 0, this.width, this.height);
 			}
 		},
-		// 舞台表演开始
+		/**
+		 * 开始一个计时器，重绘
+		 */
 		start: function () {
 			this.isStart = true;
 			this.timer = setInterval((function (param) {
@@ -524,7 +529,9 @@
 				}
 			})(this), this.CONFIG.interval)
 		},
-		// 结束
+		/**
+		 * 停止重绘
+		 */
 		stop: function () {
 			this.isStart = false;
 			clearInterval(this.timer);
@@ -601,9 +608,21 @@
 		 * 移除指定子sprite 的 index
 		 */
 		getChildIndex: function (child) { return this._super(child) },
+		/**
+		 * 是否包含一个子sprite
+		 */
 		contains: function (child) { return this._super(child) },
+		/**
+		 * 派发鼠标事件
+		 */
 		dispatchMouseEvent: function (type, x, y) { return this._super(type, x, y) },
+		/**
+		 * 清除已经被推入hover状态列表的sprites
+		 */
 		clearHoverChildren: function () { return this._super() },
+		/**
+		 * 重绘方法
+		 */
 		render: function (rd) {
 			this.draw(rd);
 			// 强制缩放，保证子对象不会比自己大
@@ -622,6 +641,9 @@
 						this.height < this.maxHeight ? this.maxHeight/this.height : 1
 					);
 		},
+		/**
+		 * 自定义事件，sprite onDrag
+		 */
 		onDrag: function (x, y) {
 			var context = this;
 			this.isDragging = true;
@@ -641,6 +663,9 @@
 			this.stage.addEventListener('mousemove', this.dragFunc);
 			this.stage.addEventListener('mouseout', this.dropFunc);
 		},
+		/**
+		 * 自定义sprite drop事件
+		 */
 		onDrop: function () {
 			this.isDragging = false;
 			this.dragPos = {};
@@ -841,6 +866,12 @@
 
 	 */
 	var Particle = Class.extend({
+	/**
+     * @lends Laro.Particle.prototype
+     */
+		/**
+		 * @ignore
+		 */
 		init: function (option) {
 			this.position = option.position;
 			this.velocity = option.velocity;
@@ -864,6 +895,12 @@
 
 	 */
 	var ParticleSystem = Class.extend({
+	/**
+     * @lends Laro.ParticleSystem.prototype
+     */
+		/**
+		 * @ignore
+		 */
 		init: function () {
 			this.$private = {
 				particles : []
@@ -874,10 +911,16 @@
 
 		},
 		// push 粒子到发射备用区
+		/**
+		 * push 粒子到发射备用区
+		 */
 		emit: function (particle) {
 			this.$private.particles.push(particle);
 		},
 		// 模拟运动(在当前时间微分下)
+		/**
+		 * 模拟运动(在当前时间微分下)
+		 */
 		simulate: function (dt) {
 			this.aging(dt);
 			this.applyGravity();
@@ -885,6 +928,9 @@
 			this.kinematics(dt);
 		},
 		// 判断粒子的生存时间
+		/**
+		 * 判断粒子的生存时间
+		 */
 		aging: function (dt) {
 			for (var i=0; i < this.$private.particles.length; ) {
 				var p = this.$private.particles[i];
@@ -896,16 +942,25 @@
 				}
 			}
 		},
+		/**
+		 * 杀死一个指定index的粒子，移除重绘列表
+		 */
 		kill: function (index) {
 			if (index < this.$private.particles.length) {
 				this.$private.particles.splice(index, 1);
 			}	  
 		},
+		/**
+		 * 添加重力
+		 */
 		applyGravity: function () {
 			for (var i in this.$private.particles) {
 				this.$private.particles[i].acceleration = this.gravity;
 			}			  
 		},
+		/**
+		 * 添加简单的边界限制
+		 */
 		applyEffectors: function () {
 			for (var j in this.effectors) {
 				var apply = this.effectors[j].apply;
@@ -915,6 +970,9 @@
 			}				
 		},
 		// 运动学变换，矢量叠加
+		/**
+		 * 运动学变换，矢量叠加
+		 */
 		kinematics: function (dt) {
 			for (var i in this.$private.particles) {
 				var p  = this.$private.particles[i];
@@ -950,6 +1008,9 @@
 
 	 */
 	var ParticleBlock = Class.extend({
+		/**
+		 * @ignore
+		 */
 		init: function (x1, y1, x2, y2)	{
 			this.apply = function (particle) {
 				if (particle.position.x - particle.size < x1 || particle.position.x + particle.size > x2) {
@@ -960,11 +1021,8 @@
 				}
 			}
 		}	
-	})
+	});
 
-	/**
-	 * @pulic Interface
-	 */
     
     var CVS = {};
     // merge Class to CVS
@@ -977,11 +1035,31 @@
     CVS.$particleSystem = ParticleSystem;
     CVS.$particleBlock = ParticleBlock;
     
-    // merge methods to CVS
+    
+	/**
+	 * @function
+	 * @memberOf Laro
+	 */
     extend(CVS, {
+		/**
+		 * 生成一个Sprite 实例，等价于 new Laro.$sprite(...)
+		 * @memberOf Laro
+		 * @function
+		 * @name createSprite
+		 *
+		 * @return Sprite 实例
+		 */ 
 		createSprite: function (ctx, options) {
 			return new Sprite(ctx, options);
 		},
+		/**
+		 * 生成一个3维空间的点 的 sprite实例
+		 * @memberOf Laro
+		 * @function
+		 * @name createPoint3D
+		 *
+		 * @return Sprite 实例
+		 */ 
         createPoint3D: function (ctx, options) {
             var _vpx = 0,
 				_vpy = 0,
@@ -1069,6 +1147,14 @@
 			  
 			return point3d;
         },
+		/**
+		 * 生成一个三角形的sprite实例
+		 * @memberOf Laro
+		 * @function
+		 * @name createTriangle
+		 *
+		 * @return Sprite 实例
+		 */ 
 		createTriangle: function (ctx, a, b, c, color, isStroke) {
 			isStroke = isStroke == undefined ? true : isStroke;
 		  var pointA = a,
@@ -1167,6 +1253,14 @@
 		  
 		  return triangle;
 		},
+		/**
+		 * 生成环境 平行光照 环境
+		 * @memberOf Laro
+		 * @function
+		 * @name createLight
+		 *
+		 * @return {Object}
+		 */ 
 		createLight: function (x, y, z, brightness) {
 			x = (x === undefined) ? -100 : x;
 			y = (y === undefined) ? -100 : y;
