@@ -1,6 +1,8 @@
 #Laro#
 A Game Engine base on Html5 
 
+By [Tencent AlloyTeam](http://www.AlloyTeam.com/)
+
 ## Examples ##
 查看以下demo最好使用chrome  : )
 
