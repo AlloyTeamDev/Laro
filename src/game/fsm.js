@@ -240,7 +240,9 @@ Laro.register('.game', function (La) {
 
      * @return AppFSM 实例
      */
-    var AppFSM = FSM.extend().methods({
+    var AppFSM = FSM.extend(function () {
+        this._STRING2NUM = {};
+    }).methods({
     /**
      * @lends Laro.AppFSM.prototype
      */
@@ -261,7 +263,99 @@ Laro.register('.game', function (La) {
             // 鼠标事件
             var s = this.getCurrentState();
             !!s && s.onMouse(x, y, left, leftPressed);
+        },
+        /**
+         * 添加一个状态到当前状态机
+         */
+        addState: function (name, sClass) {
+            var oldLen = this.stateArray.length;
+            if (!sClass instanceof Laro.BaseState) {
+                console.error('不能添加一个非状态类');
+                return false;
+            }
+            this.stateArray[oldLen] = new sClass(this.host, this, oldLen);
+            this._STRING2NUM[String(name)] = oldLen;
+            return sClass;
+        },
+
+        /**
+         * 打包多个状态为一个新状态，并添加到状态列表
+         * 进入这个新状态时会同时触发组成这个状态的子状态的所有enter事件，其他的事件亦是如此次
+         * @param name {String} :新状态的名字
+         * @param slist {Array} : 组成新状态的所有子状态ind或者name
+         * @return {Class} 新状态Class
+         */
+        packageState: function (name, slist, sClass) {
+            var _this = this,
+                oldLen = this.stateArray.length,
+                ins = (sClass && sClass instanceof Laro.BaseState) ? new sClass(this.host, this, oldLen) : null;
+
+            function exec (method, args) {
+                for (var i = 0; i < slist.length; i ++) {
+                    var ind = typeof slist[i] == 'number' ? slist[i] : _this._STRING2NUM[slist[i]];
+                    _this.stateArray[ind][method] && _this.stateArray[ind][method].apply(_this.stateArray[ind], args);
+                    
+                }
+
+                ins && ins[method] && ins[method].apply(ins, args);
+            }
+
+            var newState = Laro.BaseState.extend(function () {
+                
+            }).methods({
+                enter: function (msg, from) {
+                    exec('enter', arguments);
+                },
+                leave: function () {
+                    exec('leave', arguments);
+                },
+                update: function (dt) {
+                    exec('update', arguments);
+                },
+                suspended: function (dt) {
+                    exec('suspended', arguments);
+                },
+                message: function (msg) {
+                    exec('message', arguments);
+                },
+                suspend: function () {
+                    exec('suspend', arguments);
+                },
+                resume: function () {
+                    exec('resume', arguments);
+                },
+                preload: function () {
+                    exec('preload', arguments);
+                },
+                cancelPreload: function () {
+                    exec('cancelPreload', arguments);
+                },
+                transition: function () {
+                    exec('transition', arguments);
+                }
+
+            });
+
+            this.addState(name, newState);
+
+            return newState;
+        },
+
+        /**
+         * 重写setState，让其可以兼容正常的 num 类型的id 和 string类型的名字
+         */
+        setState: function (stateid, msg, suspendedCurrent) {
+
+            if (typeof stateid == 'string') {
+                stateid = this._STRING2NUM[stateid];
+            }
+            if (typeof stateid != 'number') {
+                console.error('找不到要跳转的state');
+                return;
+            }
+            return this.supr(stateid, msg, suspendedCurrent);
         }
+
     })
 
     this.FSM = FSM;

@@ -16,15 +16,15 @@ Laro.register('.game', function (La) {
         this.isSuspended = false;
 
     }).methods({
-        enter: function (msg, fromState) {throw 'no enter'},
-        leave: function () {throw 'no leave'},
-        update: function (dt) {throw 'no update'},
-        suspended: function (dt) {throw 'no suspended'},
-        message: function (msg) { throw 'no message'},
-        suspend: function () {throw 'no suspend'},
-        resume: function (msg, fromState) {throw 'no resume'},
-        preload: function () {throw 'no preload'},
-        cancelPreload: function () {throw 'no cancelPreload'},
+        enter: function (msg, fromState) { console.warn('no enter') },
+        leave: function () { console.warn('no leave') },
+        update: function (dt) { console.warn('no update') },
+        suspended: function (dt) { console.warn('no suspended') },
+        message: function (msg) { console.warn('no message')},
+        suspend: function () { console.warn('no suspend') },
+        resume: function (msg, fromState) { console.warn('no resume') },
+        preload: function () { console.warn('no preload') },
+        cancelPreload: function () { console.warn('no cancelPreload') },
         transition: function () { return false }
 
     });
