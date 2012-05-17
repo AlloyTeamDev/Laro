@@ -1,10 +1,20 @@
-/**
- * JCanvas
- * 给canvas里面图形加上常用事件代理
- * @author horizon
+/** 
+ * Laro (Game Engine Based on Canvas) 
+ * Code licensed under the MIT License:
+ *
+ * @fileOverview Laro
+ * @version 1.0
+ * @author  Hongru
+ * @description 
+ * 
  */
+ 
+/**
+ * jCanvas
+ * @description
+ */ 
 
-;;;(function () {
+;(function () {
  	// mobile navigator
 	var isTouchDevice = (/andriod|iphone|ipad/.test(navigator.userAgent.toLowerCase()));
 	
@@ -322,12 +332,25 @@
 			});
 
 	/**
-	 * Stage {Class}
+	 * Stage 舞台类
 	 * 一个canvas对应一个stage实例
-	 * @inherit {objectContainerClass}
-	 * @param {htmlCanvasElement}
+
+     * @class 
+     * @name Stage
+     * @memberOf Laro
+     * 
+     * @param {CanvasHtmlElement} canvas: canvas画布 dom
+     * @param {Object} option: 其他扩展参数
+
+     * @return Stage 实例
 	 */
 	var Stage = ObjectContainerClass.extend({
+	/**
+     * @lends Laro.Stage.prototype
+     */
+		/**
+		 * @ignore
+		 */
 		init: function (canvas, option) {
 			this._super(canvas.getContext('2d'), option);
 			if (canvas === undefined) { throw new Error('htmlCanvasElement undefined') }
@@ -413,21 +436,63 @@
 			batchAddMouseEventListener(this.canvas, ['mousemove', 'mouseup', 'mousedown', 'click', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave', 'touchstart', 'touchmove', 'touchend']);	
 			batchAddKeyEventListener(this.canvas, ['keyup', 'keydown', 'keypress']);
 		},
+		/**
+		 * 刷新帧时调用函数
+		 */
 		onRefresh: function () {},
+		/**
+		 * 添加事件监听
+		 */
 		addEventListener: function (type, func) { return this._super(type, func) },
+		/**
+		 * 移除事件监听
+		 */
 		removeEventListener: function (type, func) { return this._super(type, func) },
+		/**
+		 * 移除所有事件监听
+		 */
 		removeAllEventListener: function (type) { return this._super(type) },
+		/**
+		 * 是否有事件监听
+		 */
 		hasEventListener: function (type) { return this._super(type) },
+		/**
+		 * 获取canvas context
+		 */
 		getContext: function () { return this._super() },
+		/**
+		 * 添加子sprite
+		 */
 		addChild: function (child) { return this._super(child) },
+		/**
+		 * 添加子sprite 到指定序列
+		 */
 		addChildAt: function (child, index) { return this._super(child, index) },
+		/**
+		 * 移除子sprite
+		 */
 		removeChild: function (child) { return this._super(child) },
+		/**
+		 * 移除指定位置子sprite
+		 */
 		removeChildAt: function (child, index) { return this._super(child, index) },
+		/**
+		 * 获取指定位置子sprite
+		 */
 		getChildAt: function (index) { return this._super(index) },
+		/**
+		 * 移除指定子sprite的index
+		 */
 		getChildIndex: function (child) { return this._super(child) },
+		/**
+		 * 判断是否包含某个sprite
+		 */
 		contains: function (child) { return this._super(child) },
 		dispatchMouseEvent: function (type, x, y) { return this._super(type, x, y) },
 		clearHoverChildren: function () { return this._super() },
+		/**
+		 * stage 的render 
+		 */
 		render: function (rd) { 
 			// 重绘
 			!!this.CONFIG.isClear && this.clear();
@@ -442,6 +507,9 @@
 				this.ctx.translate(-this.children[i].x, -this.children[i].y);
 			}
 		},
+		/**
+		 * 擦除画布上一块
+		 */
 		clear: function (x, y, w, h) {
 			if (x !== undefined && y !== undefined && w !== undefined && h !== undefined) {
 				this.ctx.clearRect(x, y, w, h);
@@ -449,7 +517,9 @@
 				this.ctx.clearRect(0, 0, this.width, this.height);
 			}
 		},
-		// 舞台表演开始
+		/**
+		 * 开始一个计时器，重绘
+		 */
 		start: function () {
 			this.isStart = true;
 			this.timer = setInterval((function (param) {
@@ -459,7 +529,9 @@
 				}
 			})(this), this.CONFIG.interval)
 		},
-		// 结束
+		/**
+		 * 停止重绘
+		 */
 		stop: function () {
 			this.isStart = false;
 			clearInterval(this.timer);
@@ -467,18 +539,24 @@
 	})
 
 	/**
-	 * Sprite {class}
-	 * @inherit ObjectContainerClass
-	 * @param {Object}
-	 * option {
-	 *		stage:
-	 *		x:
-	 *		y:
-	 *		width:
-	 *		height:
-	 * }
+	 * Sprite 舞台元素类
+
+     * @class 
+     * @name Sprite
+     * @memberOf Laro
+     * 
+     * @param {CanvasContext} ctx: canvas的context
+     * @param {Object} option: 其他扩展参数
+
+     * @return Sprite 实例
 	 */
 	var Sprite = ObjectContainerClass.extend({
+	/**
+     * @lends Laro.Sprite.prototype
+     */
+		/**
+		 * @ignore
+		 */
 		init: function (ctx, option) {
 			this._super(ctx, option);
 			this.isDragging = false;
@@ -486,20 +564,65 @@
 			this.dragFunc = null;
 			this.dropFunc = null;
 		},
+		/**
+		 * 添加事件监听
+		 */
 		addEventListener: function (type, func) { return this._super(type, func) },
+		/**
+		 * 移除事件监听
+		 */
 		removeEventListener: function (type, func) { return this._super(type, func) },
+		/**
+		 * 移除所有事件监听
+		 */
 		removeAllEventListener: function (type) { return this._super(type) },
+		/**
+		 * 是否有某个事件
+		 */
 		hasEventListener: function (type) { return this._super(type) },
+		/**
+		 * 获取canvas context
+		 */
 		getContext: function () { return this._super() },
+		/**
+		 * 添加子sprite
+		 */
 		addChild: function (child) { return this._super(child) },
+		/**
+		 * 添加子sprite 到指定index
+		 */
 		addChildAt: function (child, index) { return this._super(child, index) },
+		/**
+		 * 移除指定子sprite
+		 */
 		removeChild: function (child) { return this._super(child) },
+		/**
+		 * 移除指定index的子sprite
+		 */
 		removeChildAt: function (index) { return this._super(index) },
+		/**
+		 * 获取指定index的子sprite
+		 */
 		getChildAt: function (index) { return this._super(index) },
+		/**
+		 * 移除指定子sprite 的 index
+		 */
 		getChildIndex: function (child) { return this._super(child) },
+		/**
+		 * 是否包含一个子sprite
+		 */
 		contains: function (child) { return this._super(child) },
+		/**
+		 * 派发鼠标事件
+		 */
 		dispatchMouseEvent: function (type, x, y) { return this._super(type, x, y) },
+		/**
+		 * 清除已经被推入hover状态列表的sprites
+		 */
 		clearHoverChildren: function () { return this._super() },
+		/**
+		 * 重绘方法
+		 */
 		render: function (rd) {
 			this.draw(rd);
 			// 强制缩放，保证子对象不会比自己大
@@ -518,6 +641,9 @@
 						this.height < this.maxHeight ? this.maxHeight/this.height : 1
 					);
 		},
+		/**
+		 * 自定义事件，sprite onDrag
+		 */
 		onDrag: function (x, y) {
 			var context = this;
 			this.isDragging = true;
@@ -537,6 +663,9 @@
 			this.stage.addEventListener('mousemove', this.dragFunc);
 			this.stage.addEventListener('mouseout', this.dropFunc);
 		},
+		/**
+		 * 自定义sprite drop事件
+		 */
 		onDrop: function () {
 			this.isDragging = false;
 			this.dragPos = {};
@@ -545,50 +674,81 @@
 			delete this.dragFunc;
 			delete this.dropFunc;
 		}
-	})
+	});
 
 	/**
 	 * Vector2 {Class}
 	 * 二维矢量类
 	 */
+	 /**
+		 * @ignore
+		 */
 	var Vector2 = Class.extend({
+				/**
+				 * @ignore
+				 */
 				init: function (x, y) {
 					this.x = x;
 					this.y = y;
 				},
+				/**
+				 * @ignore
+				 */
 				copy: function () {
 					return new Vector2(this.x, this.y);
 				},
+				/**
+				 * @ignore
+				 */
 				length: function () {
 					return Math.sqrt(this.sqrLength());
 				},
+				/**
+				 * @ignore
+				 */
 				sqrLength: function () {
 					return this.x*this.x + this.y*this.y;
 				},
 				/**
-				 * 标准化，单位长度为1
+				 * @ignore
 				 */
 				normalize: function () {
 					var inv = 1/this.length();
 					return new Vector2(this.x*inv, this.y*inv);
 				},
-				// 反向
+				/**
+				 * @ignore
+				 */
 				negate: function () {
 					return new Vector2(-this.x, -this.y);
 				},
+				/**
+				 * @ignore
+				 */
 				add: function (v) {
 					return new Vector2(this.x+v.x, this.y+v.y);
 				},
+				/**
+				 * @ignore
+				 */
 				subtract: function(v) {
 					return new Vector2(this.x-v.x, this.y-v.y);		  
 				},
+				/**
+				 * @ignore
+				 */
 				multiply: function (n) {
 					return new Vector2(this.x*n, this.y*n);		  
 				},
+				/**
+				 * @ignore
+				 */
 				divide: function (n) {
 					return new Vector2(this.x/n, this.y/n);		
 				},
-				//矢量积
+				/**
+				 * @ignore
+				 */
 				dot: function (v) {
 					return new Vector2(this.x*v.x, this.y*v.y);	 
 				}
@@ -596,17 +756,39 @@
 	Vector2.zero = new Vector2(0, 0);
 
 	/**
-	 * Color {Class}
+	 * Color 类
+
+     * @class 
+     * @name Color
+     * @memberOf Laro
+     * 
+     * @param {Number} r: 色彩值r
+     * @param {Number} g: 色彩值g
+	 * @param {Number} b: 色彩值b
+
+     * @return Color 实例
 	 */
 	var Color = Class.extend({
+	/**
+     * @lends Laro.Color.prototype
+     */
+		/**
+		 * @ignore
+		 */
 				init: function (r, g, b) {
 					this.r = r;
 					this.g =g;
 					this.b =b;
 				},
+				/**
+				 * 拷贝一份Color
+				 */
 				copy: function () {
 					return new Color(this.r, this.g, this.b);
 				},
+				/**
+				 * 颜色值相加
+				 */
 				add: function (c) {
 					return new Color(
 						Math.min(this.r+c.r, 1),
@@ -614,6 +796,9 @@
 						Math.min(this.b+c.b, 1)
 						);
 				},
+				/**
+				 * 颜色值相减
+				 */
 				subtract: function (c) {
 					return new Color(
 						Math.max(this.r-c.r, 0),
@@ -621,6 +806,9 @@
 						Math.max(this.b-c.b, 0)
 						);
 				},
+				/**
+				 * 颜色值倍增
+				 */
 				multiply: function (n) {
 					return new Color(
 							Math.min(this.r*n, 1),
@@ -628,6 +816,9 @@
 							Math.min(this.b*n, 1)
 							);		  
 				},
+				/**
+				 * 颜色值倍减
+				 */
 				divide: function (n) {
 					return new Color(this.r/n, this.g/n, this.b/n);
 				},
@@ -637,6 +828,9 @@
 				modulate: function (c) {
 					return new Color(this.r*c.r, this.g*c.g, this.b*c.b);		  
 				},
+				/**
+				 * 适配范围，保证不会超过255
+				 */
 				saturate: function () {
 					this.r = Math.min(this.r, 1);
 					this.g = Math.min(this.g, 1);
@@ -656,6 +850,10 @@
 	/**
 	 * Particle Class
 	 * 粒子类
+     * @class 
+     * @name Particle
+     * @memberOf Laro
+     * 
 	 * @param {Object}
 	 * {
 	 *		position:
@@ -664,8 +862,16 @@
 	 *		color:
 	 *		size:
 	 * }
+     * @return Particle 实例
+
 	 */
 	var Particle = Class.extend({
+	/**
+     * @lends Laro.Particle.prototype
+     */
+		/**
+		 * @ignore
+		 */
 		init: function (option) {
 			this.position = option.position;
 			this.velocity = option.velocity;
@@ -680,9 +886,21 @@
 	/**
 	 * ParticleSystem {Class}
 	 * 粒子系统，相当于粒子的一个collection
-	 * @require Particle
+
+     * @class 
+     * @name ParticleSystem
+     * @memberOf Laro
+     * 
+     * @return ParticleSystem 实例
+
 	 */
 	var ParticleSystem = Class.extend({
+	/**
+     * @lends Laro.ParticleSystem.prototype
+     */
+		/**
+		 * @ignore
+		 */
 		init: function () {
 			this.$private = {
 				particles : []
@@ -693,10 +911,16 @@
 
 		},
 		// push 粒子到发射备用区
+		/**
+		 * push 粒子到发射备用区
+		 */
 		emit: function (particle) {
 			this.$private.particles.push(particle);
 		},
 		// 模拟运动(在当前时间微分下)
+		/**
+		 * 模拟运动(在当前时间微分下)
+		 */
 		simulate: function (dt) {
 			this.aging(dt);
 			this.applyGravity();
@@ -704,6 +928,9 @@
 			this.kinematics(dt);
 		},
 		// 判断粒子的生存时间
+		/**
+		 * 判断粒子的生存时间
+		 */
 		aging: function (dt) {
 			for (var i=0; i < this.$private.particles.length; ) {
 				var p = this.$private.particles[i];
@@ -715,16 +942,25 @@
 				}
 			}
 		},
+		/**
+		 * 杀死一个指定index的粒子，移除重绘列表
+		 */
 		kill: function (index) {
 			if (index < this.$private.particles.length) {
 				this.$private.particles.splice(index, 1);
 			}	  
 		},
+		/**
+		 * 添加重力
+		 */
 		applyGravity: function () {
 			for (var i in this.$private.particles) {
 				this.$private.particles[i].acceleration = this.gravity;
 			}			  
 		},
+		/**
+		 * 添加简单的边界限制
+		 */
 		applyEffectors: function () {
 			for (var j in this.effectors) {
 				var apply = this.effectors[j].apply;
@@ -734,6 +970,9 @@
 			}				
 		},
 		// 运动学变换，矢量叠加
+		/**
+		 * 运动学变换，矢量叠加
+		 */
 		kinematics: function (dt) {
 			for (var i in this.$private.particles) {
 				var p  = this.$private.particles[i];
@@ -758,10 +997,20 @@
 	})
 
 	/**
-	 * ParticleBlock Class
-	 * @require [Particle, ParticleSystem]
+	 * ParticleBlock {Class}
+	 * 粒子格挡墙
+
+     * @class 
+     * @name ParticleBlock
+     * @memberOf Laro
+     * 
+     * @return ParticleBlock 实例
+
 	 */
 	var ParticleBlock = Class.extend({
+		/**
+		 * @ignore
+		 */
 		init: function (x1, y1, x2, y2)	{
 			this.apply = function (particle) {
 				if (particle.position.x - particle.size < x1 || particle.position.x + particle.size > x2) {
@@ -772,11 +1021,8 @@
 				}
 			}
 		}	
-	})
+	});
 
-	/**
-	 * @pulic Interface
-	 */
     
     var CVS = {};
     // merge Class to CVS
@@ -789,11 +1035,31 @@
     CVS.$particleSystem = ParticleSystem;
     CVS.$particleBlock = ParticleBlock;
     
-    // merge methods to CVS
+    
+	/**
+	 * @function
+	 * @memberOf Laro
+	 */
     extend(CVS, {
+		/**
+		 * 生成一个Sprite 实例，等价于 new Laro.$sprite(...)
+		 * @memberOf Laro
+		 * @function
+		 * @name createSprite
+		 *
+		 * @return Sprite 实例
+		 */ 
 		createSprite: function (ctx, options) {
 			return new Sprite(ctx, options);
 		},
+		/**
+		 * 生成一个3维空间的点 的 sprite实例
+		 * @memberOf Laro
+		 * @function
+		 * @name createPoint3D
+		 *
+		 * @return Sprite 实例
+		 */ 
         createPoint3D: function (ctx, options) {
             var _vpx = 0,
 				_vpy = 0,
@@ -881,6 +1147,14 @@
 			  
 			return point3d;
         },
+		/**
+		 * 生成一个三角形的sprite实例
+		 * @memberOf Laro
+		 * @function
+		 * @name createTriangle
+		 *
+		 * @return Sprite 实例
+		 */ 
 		createTriangle: function (ctx, a, b, c, color, isStroke) {
 			isStroke = isStroke == undefined ? true : isStroke;
 		  var pointA = a,
@@ -979,6 +1253,14 @@
 		  
 		  return triangle;
 		},
+		/**
+		 * 生成环境 平行光照 环境
+		 * @memberOf Laro
+		 * @function
+		 * @name createLight
+		 *
+		 * @return {Object}
+		 */ 
 		createLight: function (x, y, z, brightness) {
 			x = (x === undefined) ? -100 : x;
 			y = (y === undefined) ? -100 : y;
