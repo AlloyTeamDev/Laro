@@ -1,0 +1,33 @@
+{
+    "laro.0.3": {
+        "licence": "./src/laro.licence.js",
+        "source": [
+            "./src/laro.global.js",
+            "./src/base/module.js",
+            "./src/base/exception.js",
+            "./src/base/class.js",
+            "./src/geometry/pixel32.js",
+            "./src/game/state.js",
+            "./src/game/fsm.js",
+            "./src/game/game.util.js",
+            "./src/sound/sound.js",
+            "./src/game/resource.class.js",
+            "./src/actions/animation.js",
+            "./src/actions/animation_handle.js",
+            "./src/world/image_wrapper.js",
+            "./src/geometry/point2.js",
+            "./src/geometry/vector2.js",
+            "./src/geometry/rectf.js",
+            "./src/world/layer.js",
+            "./src/world/render.js",
+            "./src/world/canvas_render.js",
+            "./src/geometry/chaikin.js",
+            "./src/geometry/perlin.js",
+            "./src/geometry/util.js",
+            "./src/input/keyboard.js",
+            "./src/game/jcanvas.0.2.js",
+            "./src/versions/0.3.js"
+        ],
+        "target": "build/laro.0.3.js"
+    }
+}

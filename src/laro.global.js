@@ -3,14 +3,13 @@
  * Code licensed under the MIT License:
  *
  * @fileOverview Laro
- * @version 1.0
  * @author  Hongru
  * @description 
  * 
  */
 
 
-(function (win, undefined) {
+;(function (win, undefined) {
     /**
      * Laro - 顶级命名空间
      * 
@@ -19,7 +18,6 @@
      */
     var __INFO__ = {
         $name: 'Laro',
-        $version: '0.1',
         $description: 'game engine based on html5'
     };
 

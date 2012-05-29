@@ -294,14 +294,14 @@ Laro.register('.game', function (La) {
                 for (var i = 0; i < slist.length; i ++) {
                     var ind = typeof slist[i] == 'number' ? slist[i] : _this._STRING2NUM[slist[i]];
                     _this.stateArray[ind][method] && _this.stateArray[ind][method].apply(_this.stateArray[ind], args);
-                    
+
                 }
 
                 ins && ins[method] && ins[method].apply(ins, args);
             }
 
             var newState = Laro.BaseState.extend(function () {
-                
+
             }).methods({
                 enter: function (msg, from) {
                     exec('enter', arguments);
@@ -362,4 +362,4 @@ Laro.register('.game', function (La) {
     this.AppFSM = AppFSM;
     Laro.extend(this);
 
-})
+});
