@@ -4,7 +4,9 @@
 <meta charset="utf-8" />
 <title>Animation Editor</title>
 <link href="../css/common.css" rel="stylesheet" />
-<script src="../js/lib/leta.0.1.js"></script>
+<script src="../js/lib/leta.0.2.js"></script>
+<script src="../../build/laro.0.2.js"></script>
+<script src="../js/leditor.js"></script>
 <style>
 .container {
     margin: 0 auto;
@@ -27,7 +29,77 @@
 .container.dragover {
     background: #b0e24a;
 }
-
+canvas {
+	display: block;
+	margin: 0 auto;
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEW/v7////+Zw/90AAAAEUlEQVQI12P4z8CAFWEX/Q8Afr8P8erzE9cAAAAASUVORK5CYII=);
+	-webkit-box-shadow: 0 0 5px #000;
+}
+.hide {
+	display:none;
+}
+.edit-area {
+	
+}
+.ea-show {
+	width: 600px;
+	overflow:hidden;
+	background: #fff;
+	border: 1px solid #999;
+	margin: 16px auto;
+	list-style: none;
+}
+.ea-show li {
+	list-style: none;
+}
+.ea-input {
+	width: 40px;
+	text-align: center;
+}
+.ea-setting {
+	float: left;
+	padding: 10px 14px;
+	font-size: 12px;
+	font-family: 微软雅黑;
+	background: #f3f3f3;
+	border-right: 1px solid #999;
+	padding-bottom: 9999px;
+	margin-bottom: -9989px;
+}
+.ea-setting label {
+	display: inline-block;
+	text-align: right;
+}
+.output-wrap {
+	width: 600px;
+	margin: 0 auto;
+}
+.output-wrap textarea {
+	width: 99%;
+	min-height: 200px;
+}
+.tab-wrap {
+	margin: 0 auto;
+	width: 500px;
+}
+.tab-con {
+	min-width: 500px;
+	min-height: 320px;
+}
+.tab-header {overflow:hidden}
+.tab-header .hd-btn {
+	width: 49.6%;
+	font-family: 微软雅黑;
+	line-height: 36px;
+	background: rgba(0, 0, 0, 0.3);
+}
+.fl {float: left}
+.fr {float: right}
+.reset-btn-wrap {
+	width: 600px;
+	margin: 0 auto;
+	text-align: right;
+}
 </style>
 </head>
 
@@ -35,8 +107,49 @@
 <section>
 	<div class="doc">
 		<h1>Animation Editor</h1>
-		<div id="container" class="container noimg">
-			Drag an image here
+		
+		<div class="tab-wrap">
+			<div id="drag-way-con">
+				<div id="container" class="container noimg">
+					Drag an image here
+				</div>
+			</div>
+		</div>
+		
+		<div id="edit-area" class="edit-area hide">
+			
+			<canvas id="frame-canvas"></canvas>
+			<div class="ea-show">
+				<ul class="ea-setting">
+					<li><label>图片宽：</label><input id="imgw" class="ea-input" type="text" /></li>
+					<li><label>图片高：</label><input id="imgh" class="ea-input" type="text" /></li>
+					<li><label>总帧数：</label><input id="frame-num" class="ea-input" type="text" /></li>
+					<li><label>帧排列：</label>
+						<select id="frame-sel">
+							<option value="h" selected="true">横向</option>
+							<option value="v">纵向</option>
+						</select>
+					</li>
+					<li><label>帧速率：</label><input id="frame-rate" class="ea-input" type="text" /></li>
+					<li><label>中心x：</label><input id="pivot-x" class="ea-input" type="text" /></li>
+					<li><label>中心y：</label><input id="pivot-y" class="ea-input" type="text" /></li>
+					
+					<li style="padding-top:10px;border-top:1px solid #999">
+						<label>Animation Name：</label><input id="anim-name" class="ea-input" type="text" />
+					</li>
+					<li><label>资源路径：</label><input id="filename" type="text" /></li>
+					<li><button id="btn-go">GO!</button></li>
+				</ul>
+				
+				<div id="canvas-container">
+				
+				</div>
+			</div>
+			<div class="reset-btn-wrap"><button id="reset-btn">Reset</button></div>
+		</div>
+		
+		<div id="output-wrap" class="output-wrap hide">
+			<textarea id ="anim-data"></textarea>
 		</div>
 	</div>
 </section>
@@ -46,10 +159,10 @@ Leta.NS('LAE', function ($L) {
 	var pkg = this;
 	var els = {};
 	var $E = $L.event;
-	var $ = function (sel) {
-		return (/^\s*<([^\s>]+)/).test(sel) ? $L.$dom($L.$dom.create(sel)) : $L.$dom($L.$qsa(sel));
-	};
-	this.$ = $;
+	var $ = $L.$;
+	var $id = document.getElementById;
+	
+	var fnum = 0, unitW, unitH, picW, picH;
 	
 	this.init = function () {
 		//alert($L.browser.msie)
@@ -58,10 +171,118 @@ Leta.NS('LAE', function ($L) {
 	};
 	this.getEls = function () {
 		els.$con = $('#container');
+		els.$ea = $('#edit-area');
+		els.$imgw = $('#imgw');
+		els.$imgh = $('#imgh');
+		els.$fnum = $('#frame-num');
+		els.$fsel = $('#frame-sel');
+		els.$frate = $('#frame-rate');
+		els.$pivotx = $('#pivot-x');
+		els.$pivoty = $('#pivot-y');
+		els.$btngo = $('#btn-go');
+		els.$aname = $('#anim-name');
+		els.$filename = $('#filename');
+		els.$reset = $('#reset-btn');
+		
+		els.$animData = $('#anim-data');
+		
+		fnum = els.$fnum.val();
 	};
 	this.bind = function () {
 		this.bindDragDrop();
+		this.bindSetting();
+	};
+
+	this.bindSetting = function () {
+		$E.on(els.$btngo[0], 'click', function (e) {
+			pkg.go();
+		});
+		$E.on(els.$fnum[0], 'keyup', function (e) {
+			pkg.setPivotDefaultValue();
+		});
+		$E.on(els.$fsel[0], 'change', function (e) {
+			//alert($(this).val())
+			pkg.setPivotDefaultValue();
+		});
+		$E.on(els.$reset[0], 'click', function (e) {
+			pkg.reset();
+		});
+	};
+	
+	this.reset = function () {
+		LAE.test && LAE.test.looper && LAE.test.looper.stop();
+		LAE.test && LAE.test.render && LAE.test.render.clear();
 		
+		$('.tab-wrap').show('block');
+		els.$ea.hide();
+		$('#output-wrap').hide();
+		els.$fnum.val('');
+		els.$pivotx.val('');
+		els.$pivoty.val('');
+	};
+	
+	this.setPivotDefaultValue = function () {
+		if (els.$fsel.val() == 'h') {
+			unitH = picH;
+			unitW = picW/(Number(els.$fnum.val()));
+		} else {
+			unitW = picW;
+			unitH = picH/(Number(els.$fnum.val()));
+		}
+		
+		els.$pivotx.val(''+Math.floor(unitW/2));
+		els.$pivoty.val(''+Math.floor(unitH/2));
+	};
+	this.go = function () {
+		var o = this.outputData();
+		var obj = {};
+		obj[o.name] = o.data;
+		Laro.$lea.setSourceObj(obj);
+		Laro.$lea.setLoader(LAE.test.loader);
+		LAE.test.init(o.data.filename, o.name, unitW, unitH);
+	};
+	this.outputData = function () {
+		$('#output-wrap').show('block');
+		return this.opAnimData();
+	};
+	this.opAnimInfo = function () {	
+		var ret = {};
+		ret['nbrOfFrames'] = Number(els.$fnum.val());
+		ret['name'] = els.$aname.val();
+		ret['type'] = 'animation';
+		ret['framerate'] = Number(els.$frate.val());
+		ret['pivotx'] = Number(els.$pivotx.val());
+		ret['pivoty'] = Number(els.$pivoty.val());
+		ret['events'] = [];
+		
+		return ret;
+	};
+	this.opAnimData = function () {
+		var ret = [];
+		
+		for (var i = 0; i < Number(els.$fnum.val()); i ++) {
+			var arr = [];
+			
+			els.$fsel.val() == 'h' ? 
+			arr.push(i*unitW, 0, ((i+1)*unitW-1), (unitH-1), i*unitW, 0, ((i+1)*unitW-1), (unitH-1)) :
+			arr.push(0, i*unitH, (unitW-1), ((i+1)*unitH-1), 0, i*unitH, (unitW-1), ((i+1)*unitH-1));
+			
+			ret.push(arr);
+		}
+		
+		var dataO = {};
+		dataO['info'] = this.opAnimInfo();
+		dataO['data'] = ret;
+		dataO['filename'] = els.$filename.val();
+		
+		var jsonText = LAE.JSONFormat(dataO);
+		jsonText = '"'+els.$aname.val()+'": ' + jsonText;
+
+		els.$animData.val(jsonText);
+		return {
+			name: els.$aname.val(),
+			data: dataO
+		};
 	};
 	this.bindDragDrop = function () {
 		$E.on(els.$con[0], 'dragenter', function (e) {
@@ -77,7 +298,7 @@ Leta.NS('LAE', function ($L) {
 		});
 		$E.on(els.$con[0], 'drop', function (e) {
 			e.preventDefault();
-
+			console.log(e);
 			var dt = e.dataTransfer || e.originalEvent.dataTransfer;  
 			var files = dt.files; 
 
@@ -93,22 +314,170 @@ Leta.NS('LAE', function ($L) {
 				continue;  
 			}  
 
-			// FileReader 不支持file协议
 			var reader = new FileReader();  
 			reader.onload = function(e){ 
-				$('body').append($('<img alt="" src="'+e.target.result+'" />'))
-				//pkg.setFx('normal', e.target.result);
-			/*	var nodes = $L.$dom.create('<img src="'+e.target.result+'" />');
-				$L.$dom(nodes).appendTo(els.$con);
+				//$('body').append($('<img alt="" src="'+e.target.result+'" />'))
+				pkg.pushToCanvas(e.target.result);
 				els.$con.removeClass('dragover');
-				els.$con.removeClass('noimg');*/
+				
 			}
 
 			reader.readAsDataURL(file);  
 		}  
+	};
+	this.pushToCanvas = function (src) {
+		$('.tab-wrap').hide();
+		els.$ea.show('block');
+	
+		var cvs = $('#frame-canvas').get(0);
+		var frameImg = $('#frame-img').get(0);
+		if (!cvs) {
+			$('<canvas id="frame-canvas"></canvas>').appendTo(els.$ea);
+			cvs = $('#frame-canvas').get(0);
+		}
+		
+		if (!frameImg) {
+			$('<img id="frame-img" style="display:none" src="'+src+'" />').appendTo(els.$ea);
+			frameImg = $('#frame-canvas').get(0);
+		} else {
+			frameImg.src = src;
+		}
+		
+		var ctx = cvs.getContext('2d');
+		$L.imgReady(src, function () {
+			cvs.width = this.width;
+			cvs.height = this.height;
+			picW = this.width;
+			picH = this.height;
+			
+			els.$imgw.val(String(this.width));
+			els.$imgh.val(String(this.height));
+			els.$frate.val('10');
+			
+			pkg.IMG = this;
+		
+		}, function () {
+			ctx.clearRect(0, 0, cvs.width, cvs.height);
+			ctx.drawImage(this, 0, 0);
+			
+		});
 	}
 	
 });
+
+// JSON format
+// 生成带缩进的格式化后的json格式 的文本
+Leta.NS('LAE', function ($L) {
+	var pkg = this;
+	var p = [],
+		push = function( m ) { return '\\' + p.push( m ) + '\\'; },
+		pop = function( m, i ) { return p[i-1] },
+		tabs = function( count ) { return new Array( count + 1 ).join( '    ' ); };
+
+	this.JSONFormat = function( json ) {
+		if (Object.prototype.toString.call(json) == '[object Object]') {
+			json = JSON.stringify(json);
+		}
+		p = [];
+		var out = "",
+			indent = 0;
+
+		// Extract backslashes and strings
+		json = json
+			.replace( /\\./g, push )
+			.replace( /(".*?"|'.*?')/g, push )
+			.replace( /\s+/, '' );		
+
+		// Indent and insert newlines
+		for( var i = 0; i < json.length; i++ ) {
+			var c = json.charAt(i);
+
+			switch(c) {
+				case '{':
+				case '[':
+					out += c + "\n" + tabs(++indent);
+					break;
+				case '}':
+				case ']':
+					out += "\n" + tabs(--indent) + c;
+					break;
+				case ',':
+					out += ",\n" + tabs(indent);
+					break;
+				case ':':
+					out += ": ";
+					break;
+				default:
+					out += c;
+					break;      
+			}					
+		}
+
+		// Strip whitespace from numeric arrays and put backslashes 
+		// and strings back in
+		out = out
+			.replace( /\[[\d,\s]+?\]/g, function(m){ return m.replace(/\s/g,''); } )
+			.replace( /\\(\d+)\\/g, pop ) // strings
+			.replace( /\\(\d+)\\/g, pop ); // backslashes in strings
+
+		return out;
+	};
+});
+
+// Laro example
+Laro.register('LAE.test', function (La) {
+	var pkg = this;
+	
+	this.loader = new Laro.ResourceLoader();
+	
+	this.init = function (src, name, w, h) {
+		if (this.looper) this.looper.stop();
+		this.canvas = null;
+		this.render = null;
+		this.looper = null;
+		
+		this.w = w;
+		this.h = h;
+		this.name = name;
+		
+		document.getElementById('canvas-container').innerHTML = '';
+		//this.loader.preload([src], La.curry(this.loadCallback, this))
+		this.doInit();
+		
+	};
+	this.loadCallback = function (p) {
+		(p >= 1) && this.doInit();
+	}; 
+	this.doInit = function () {
+		this.anim = La.$lea.getAnimation(this.name, null, null, LAE.IMG, true);
+		this.getRender();
+		this.looper = new La.Loop(this.loop, this);
+		this.anim.play();
+	};
+	this.getRender = function () {
+		var	canvas = document.createElement('canvas');
+		document.getElementById('canvas-container').appendChild(canvas);
+		this.canvas = canvas;
+		canvas.width = this.w;
+		canvas.height = this.h;
+		this.render = new La.CanvasRender(canvas, 1, false);
+	};
+	
+	this.loop = function (dt) {
+		this.update(dt);
+		this.draw();
+	};
+	
+	this.update = function (dt) {
+		this.anim.update(dt);
+	};
+	this.draw = function () {
+		var render = this.render;
+		render.clear();
+		this.anim.draw(render, render.getWidth()/2, render.getHeight()/2, 0, 1, null);
+	};
+});
+
 Leta.domReady(function () { LAE.init(); })
 </script>
 </body>
