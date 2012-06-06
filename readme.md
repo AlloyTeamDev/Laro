@@ -10,7 +10,7 @@ http://hongru.github.com/proj/laro/examples/typeshot/index.html
 
 http://hongru.github.com/proj/laro/examples/jxhome/
 
-http://heroes.github.com/world-of-heroes/stable/
+http://heroes.github.com/world-of-heroes/development/
 
 ## Test cases ##
 * [Canvas Transform](http://hongru.github.com/proj/laro/test/canvas.transform.html)
