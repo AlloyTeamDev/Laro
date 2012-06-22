@@ -11,25 +11,18 @@
         isTouchDevice = (/andriod|iphone|ipad/.test(navigator.userAgent.toLowerCase()));
     
     // DisplayClass
-    var DisplayClass = Class({
-        initialize: function (option) {
-            this.x = 0;
-            this.y = 0;
-            this.width = 0;
-            this.height = 0;
-            this.stage = null;
-            this.draw = function () {};
-
-            typeof option == 'function' ? option.call(this) : extend(this, option || {});
-        }
+    var DisplayClass = Class(function () {
+        this.x = 0;
+        this.y = 0;
+        this.width = 0;
+        this.height = 0;
+        this.stage = null;
     });
     
     //InteractiveClass
-    var InteractiveClass = DisplayClass.extend({
-        initialize: function (option) {
-            this.supr(option);
-            this.eventListener = {};
-        },
+    var InteractiveClass = DisplayClass.extend(function () {
+        this.eventListener = {};
+    }).methods({
         addEventListener: function (type, func) {
             if (this.eventListener[type] === null || this.eventListener[type] === undefined) {
                 this.eventListener[type] = [];
@@ -65,15 +58,13 @@
     });
     
     // ObjectContainerClass
-    var ObjectContainerClass = InteractiveClass.extend({
-        initialize: function (option) {
-            this.supr(option);
-            this.children = [];
-            this.maxWidth = 0;
-            this.maxHeight = 0;
-            this.hoverChildren = [];
-            
-        },
+    var ObjectContainerClass = InteractiveClass.extend(function () {
+        this.children = [];
+        this.maxWidth = 0;
+        this.maxHeight = 0;
+        this.hoverChildren = [];
+    }).methods({
+
         addChild: function (child) {
             if (this.maxWidth < child.x + child.width) {
                 this.maxWidth = child.x + child.width;
@@ -262,87 +253,86 @@
     });
     
     // Stage
-    var Stage = ObjectContainerClass.extend({
-        initialize: function (canvas, option) {
-            this.supr(option);
+    var Stage = ObjectContainerClass.extend(function (canvas, option) {
+        this.canvas = canvas;
+        this.ctx = this.canvas.getContext('2d');
+        this.stage = null;
+        this.width = canvas.width;
+        this.height = canvas.height;
+        
+        var win = window, 
+            html = document.documentElement,
+            context = this;
             
-            this.canvas = canvas;
-            this.ctx = this.canvas.getContext('2d');
-            this.stage = null;
-            this.width = canvas.width;
-            this.height = canvas.height;
-            
-            var win = window, 
-                html = document.documentElement,
-                context = this;
-                
-            function getWindowScroll() {
-                return { x: win.pageXOffset || html.scrollLeft, y: win.pageYOffset || html.scrollTop };
+        function getWindowScroll() {
+            return { x: win.pageXOffset || html.scrollLeft, y: win.pageYOffset || html.scrollTop };
+        }
+        function getOffset (el) {
+            el = el || context.canvas;
+            var width = el.offsetWidth,
+                height = el.offsetHeight,
+                top = el.offsetTop,
+                left = el.offsetLeft;
+            while (el = el.offsetParent) {
+                top = top + el.offsetTop;
+                left = left + el.offsetLeft;
             }
-            function getOffset (el) {
-                el = el || context.canvas;
-                var width = el.offsetWidth,
-                    height = el.offsetHeight,
-                    top = el.offsetTop,
-                    left = el.offsetLeft;
-                while (el = el.offsetParent) {
-                    top = top + el.offsetTop;
-                    left = left + el.offsetLeft;
-                }
-                return {
-                    top: top,
-                    left: left,
-                    width: width,
-                    height: height
-                };
-            }
-
-            // 对canvasElement 监听
-            //
-            var batchAddMouseEventListener = function (el, evArr) {
-                for (var i=0; i<evArr.length; i++) { //console.log(evArr[i])
-                    el.addEventListener(evArr[i], function (param, i) {
-                        return function (e) { 
-                            var offset = getOffset(),
-                                winScroll = getWindowScroll();
-
-                            if (isTouchDevice) {
-                                e.preventDefault();
-                                var touch = evArr[i] == 'touchend' ? e.changedTouches[0] : e.touches[0];
-                                var x = touch.pageX - offset.left + winScroll.x,
-                                    y = touch.pageY - offset.top + winScroll.y;
-                            } else {
-                                var x = e.clientX - offset.left + winScroll.x,
-                                    y = e.clientY - offset.top + winScroll.y;
-                            }
-
-                            if (!!param.eventListener[evArr[i]]) {
-                                for (var j=0; j<param.eventListener[evArr[i]].length; j++) {
-                                    param.eventListener[evArr[i]][j](x, y);
-                                }
-                            }
-                            param.dispatchMouseEvent(evArr[i], x, y);
-                        }
-                    }(context, i), false);
-                }
+            return {
+                top: top,
+                left: left,
+                width: width,
+                height: height
             };
-            var batchAddKeyEventListener = function (el, evArr) {
-                for (var i=0; i<evArr.length; i++) {
-                    el.addEventListener(evArr[i], function (param, i) {
-                                return function (e) {
-                                    if (!!param.eventListener[evArr[i]]) {
-                                        for (var j=0; j<param.eventListener[evArr[i]].length; j++) {
-                                            param.eventListener[evArr[i]][j](e);
-                                        }
+        }
+
+        // 对canvasElement 监听
+        //
+        var batchAddMouseEventListener = function (el, evArr) {
+            for (var i=0; i<evArr.length; i++) { //console.log(evArr[i])
+                el.addEventListener(evArr[i], function (param, i) {
+                    return function (e) { 
+                        var offset = getOffset(),
+                            winScroll = getWindowScroll();
+
+                        if (isTouchDevice) {
+                            e.preventDefault();
+                            var touch = evArr[i] == 'touchend' ? e.changedTouches[0] : e.touches[0];
+                            var x = touch.pageX - offset.left + winScroll.x,
+                                y = touch.pageY - offset.top + winScroll.y;
+                        } else {
+                            var x = e.clientX - offset.left + winScroll.x,
+                                y = e.clientY - offset.top + winScroll.y;
+                        }
+
+                        if (!!param.eventListener[evArr[i]]) {
+                            for (var j=0; j<param.eventListener[evArr[i]].length; j++) {
+                                param.eventListener[evArr[i]][j](x, y);
+                            }
+                        }
+                        param.dispatchMouseEvent(evArr[i], x, y);
+                    }
+                }(context, i), false);
+            }
+        };
+        var batchAddKeyEventListener = function (el, evArr) {
+            for (var i=0; i<evArr.length; i++) {
+                el.addEventListener(evArr[i], function (param, i) {
+                            return function (e) {
+                                if (!!param.eventListener[evArr[i]]) {
+                                    for (var j=0; j<param.eventListener[evArr[i]].length; j++) {
+                                        param.eventListener[evArr[i]][j](e);
                                     }
                                 }
-                            }(context, i), false);
-                }
-            };
-            batchAddMouseEventListener(this.canvas, ['mousemove', 'mouseup', 'mousedown', 'click', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave', 'touchstart', 'touchmove', 'touchend']);	
-            batchAddKeyEventListener(this.canvas, ['keyup', 'keydown', 'keypress']);
-            
-        },
+                            }
+                        }(context, i), false);
+            }
+        };
+        batchAddMouseEventListener(this.canvas, ['mousemove', 'mouseup', 'mousedown', 'click', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave', 'touchstart', 'touchmove', 'touchend']);	
+        batchAddKeyEventListener(this.canvas, ['keyup', 'keydown', 'keypress']);
+        
+        typeof option == 'function' ? option.call(this) : extend(this, option || {});
+        
+    }).methods({
         onRefresh: function () {},
         getContext: function () {
             return this.ctx;
@@ -375,20 +365,18 @@
     /**
      * Sprite
      */
-    var Sprite = ObjectContainerClass.extend({
-        initialize: function (stage, option) {
-            this.supr(option);
-            
-            if (!(stage instanceof Stage)) {
-                throw "sprite need a stage"
-            }
-            this.stage = stage;
-            this.canvas = stage.canvas;
-            this.ctx = stage.ctx;
-            
-            stage.addChild(this);
+    var Sprite = ObjectContainerClass.extend(function (stage, option) {
+        if (!(stage instanceof Stage)) {
+            throw "sprite need a stage"
+        }
+        this.stage = stage;
+        this.canvas = stage.canvas;
+        this.ctx = stage.ctx;
         
-        },
+        stage.addChild(this);
+        
+        typeof option == 'function' ? option.call(this) : extend(this, option || {});
+    }).methods({
         getContext: function () {
             return this.ctx;
         },
