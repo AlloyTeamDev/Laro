@@ -5,4 +5,4 @@
  * - Laro.NS [laro.global.js]
  */
 
-Laro.$version = 0.3;
+Laro.$version = 0.4;
