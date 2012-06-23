@@ -1,5 +1,5 @@
 {
-    "laro.0.3": {
+    "laro.0.4": {
         "licence": "./src/laro.licence.js",
         "source": [
             "./src/laro.global.js",
@@ -25,9 +25,9 @@
             "./src/geometry/perlin.js",
             "./src/geometry/util.js",
             "./src/input/keyboard.js",
-            "./src/game/jcanvas.0.2.js",
-            "./src/versions/0.3.js"
+            "./src/stage/stage.js",
+            "./src/versions/0.4.js"
         ],
-        "target": "build/laro.0.3.js"
+        "target": "build/laro.0.4.js"
     }
 }
