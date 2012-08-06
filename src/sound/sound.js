@@ -118,7 +118,8 @@ Laro.register('.game', function (La) {
             delete this.channels[name];			   
         },
         pause: function () {
-            return this.audio.pause();	   
+            this.currentChannel && clearTimeout(this.currentChannel.timer);
+            return this.audio.pause();	 
         },
         preloadChannel: function (name) {
             this.pause();
