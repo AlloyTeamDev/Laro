@@ -14,7 +14,9 @@ Laro.register('.game', function (La) {
         this.genAudio();
 
         this.can = this.canPlayThisType();
-        if (!this.can) {
+        
+        // ios 4.0+ can't autoload & autoplay
+        if (!this.can || /iP(ad|od|hone)|Linux mips/i.test(navigator.userAgent)) {
             !!this.callback && this.callback();
             return;
         }
