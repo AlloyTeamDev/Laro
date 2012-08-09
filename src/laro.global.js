@@ -109,7 +109,13 @@
             loopName = loopName[names[i]]
         }
 
-        !!fn && fn.call(loopName, self[__INFO__['$name']]);
+        if (fn) {
+            if (typeof fn == 'function') {
+                fn.call(loopName, self[__INFO__['$name']]);
+            } else if (toType(fn) == 'object') {
+                extend(loopName, fn);
+            }
+        }
 
     }
 
