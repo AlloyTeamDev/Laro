@@ -38,7 +38,7 @@ Laro出现的目的是为了简化使用canvas制作游戏时的api调用。同�
 
 Laro 游戏引擎目前已经完成了游戏开发中所需要的模块和api的封装，并有一些实际的Demo和TestCase供使用者参考。而且随后会结合这个引擎整理出一套用于html5 小游戏开发的可视化编辑工具。 旨在帮助开发者更快更容易的搭建一款小游戏为目的。
 
-目前已经开源到github （https://github.com/AlloyTeam/Laro）
+目前已经开源到github （[https://github.com/AlloyTeam/Laro]()）
 
 我们团队希望通过Laro的不断完善，能够帮助更多的html5 小游戏开发者以更快的速度，更优的质量完成 html5小游戏 产业化的开发。
 
